@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 class ToolModel {
     constructor() {
@@ -7,7 +7,7 @@ class ToolModel {
             category: { type: String, required: true },
             owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // User who owns the tool
             availability: { type: Boolean, default: true }, // True = Available, False = Borrowed
-        });
+        }, { timestamps: true });
 
         this.model = mongoose.model('Tool', toolSchema);
     }
@@ -29,4 +29,4 @@ class ToolModel {
     }
 }
 
-module.exports = new ToolModel();
+export default new ToolModel();

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 class UserModel {
     constructor() {
@@ -7,7 +7,7 @@ class UserModel {
             email: { type: String, required: true, unique: true },
             password: { type: String, required: true },
             tools: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
-        });
+        },{timestamps:true});
 
         this.model = mongoose.model('User', userSchema);
     }
@@ -29,4 +29,4 @@ class UserModel {
     }
 }
 
-module.exports = new UserModel();
+export default new UserModel();
