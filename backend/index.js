@@ -8,7 +8,7 @@ dotenv.config();
 
 //this connects our project to cluster
 mongoose
-    .connect(process.env.MONGO)
+    .connect(process.engyggv.MONGO)
     .then(()=> {
         console.log("MongoDB is connected");
     })
