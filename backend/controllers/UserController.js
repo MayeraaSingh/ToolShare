@@ -46,14 +46,15 @@ class UserController {
                 email,
                 profilePicture: "", // Empty initially, can be updated later
                 flatNumber: "", // Flat number can be updated later
-                tools: [], // Empty array for tools initially
+                toolsBorrowed: [], // Empty array for tools initially
+                toolsOwned: [],
             });
 
             // Generate JWT token for new user
             const token = jwt.sign(
                 { id: newuser._id, email: newuser.email },
                 process.env.JWT_SECRET, // Use a secret key from environment variables
-                { expiresIn: '7d' } // Token expiry (e.g., 7 days)
+                { expiresIn: '7d' } // Token expiry 
             );
 
             res
@@ -119,7 +120,8 @@ class UserController {
                     email: user.email,
                     profilePicture: user.profilePicture,
                     flatNumber: user.flatNumber,
-                    tools: user.tools,
+                    toolsBorrowed,
+                    toolsOwned
                     },
                 });
         } catch (error) {

@@ -7,7 +7,8 @@ class UserModel {
                 name: { type: String },
                 email: { type: String, required: true, unique: true },
                 flatNumber: { type: String}, // New field for flat number
-                tools: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
+                toolsBorrowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools borrowed by the user
+                toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
                 profilePicture: { type: String,
                     default:"https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
                 },
