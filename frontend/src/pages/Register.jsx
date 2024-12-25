@@ -3,6 +3,7 @@ import { Button, TextInput } from "flowbite-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { registerStart, registerSuccess, registerFailure } from "../redux/userSlice"; // Correct path to your userSlice actions
+import OAuth from "../components/OAuth";
 
 export default function Register() {
   const [email, setEmail] = useState(""); // State to hold user input
@@ -88,14 +89,7 @@ export default function Register() {
 
             {/* Google Register Button */}
             <div className="w-full">
-              <Button
-                color="gray"
-                size="lg"
-                className="w-full"
-                onClick={() => alert("Google Register Coming Soon!")}
-              >
-                Register with Google
-              </Button>
+              <OAuth />
             </div>
           </div>
         </div>

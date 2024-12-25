@@ -4,6 +4,7 @@ import UserController from '../controllers/UserController.js';
 
 // Route to register a new user
 router.post('/register', UserController.register);
+router.post('/google',UserController.registerGoogle);
 
 // Route to get user by email
 router.get('/:email', UserController.getUserByEmail);
