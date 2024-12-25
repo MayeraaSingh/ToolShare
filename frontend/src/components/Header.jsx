@@ -16,7 +16,7 @@ export default function Header() {
     
           {/* Logo */}
           <Link to="/" className="text-lg sm:text-xl font-bold whitespace-nowrap">
-            <span className="text-blue-500 dark:text-blue-300">TOOL</span>
+            <span className="text-teal-500 dark:text-blue-300">TOOL</span>
             <span className="text-lightblue-400 dark:text-blue-400">SHARE</span>
           </Link>
     

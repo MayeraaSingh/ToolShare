@@ -2,12 +2,15 @@ import mongoose from "mongoose";
 
 class UserModel {
     constructor() {
-        const userSchema = new mongoose.Schema({
-            name: { type: String, required: true },
-            email: { type: String, required: true, unique: true },
-            password: { type: String, required: true },
-            tools: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
-        },{timestamps:true});
+        const userSchema = new mongoose.Schema(
+            {
+                name: { type: String },
+                email: { type: String, required: true, unique: true },
+                flatNumber: { type: String}, // New field for flat number
+                tools: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
+            },
+            { timestamps: true }
+        );
 
         this.model = mongoose.model('User', userSchema);
     }
@@ -26,6 +29,11 @@ class UserModel {
     // Update user details
     async updateUser(userId, updatedData) {
         return await this.model.findByIdAndUpdate(userId, updatedData, { new: true });
+    }
+
+    // Find user by flat number (optional utility method)
+    async findByFlatNumber(flatNumber) {
+        return await this.model.findOne({ flatNumber }).populate('tools');
     }
 }
 

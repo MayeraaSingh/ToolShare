@@ -5,7 +5,8 @@ import {BsGithub, BsInstagram, BsLinkedin,} from 'react-icons/bs';
 
 export default function FooterCom() {
   return (
-    <div className='w-full sm:flex sm: justify-between '>
+    <Footer container className=' border border-t-8 border-teal-500'>
+      <div className='w-full sm:flex sm:justify-between max-w-7xl max-auto'>
                 <Footer.Copyright 
                     href='#' 
                     by="ToolShare" 
@@ -15,6 +16,7 @@ export default function FooterCom() {
                     <Footer.Icon href='https://github.com/MayeraaSingh/ToolShare.git' icon={BsGithub} />
                     <Footer.Icon href='#' icon={BsInstagram} />
                 </div>
-    </div>
+      </div>
+    </Footer>
   )
 }
