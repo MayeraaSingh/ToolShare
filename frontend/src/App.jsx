@@ -12,10 +12,10 @@ export default function App() {
     <BrowserRouter>
       <Header />  
       <Routes>
-        <Route path='/' element={<Home />}></Route>
-        <Route path='explore' element={<Explore />}></Route>
-        <Route path='addtool' element={<AddTool />}></Route>
-        <Route path='register' element={<Register/>}></Route>
+        <Route path='/' element={<Home />} />
+        <Route path='/explore' element={<Explore />} />
+        <Route path='/addtool' element={<AddTool />} />
+        <Route path='/register' element={<Register/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>
