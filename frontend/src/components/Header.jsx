@@ -4,9 +4,13 @@ import { AiOutlineSearch } from 'react-icons/ai';
 import { FaBell, FaUserCircle, FaMoon } from 'react-icons/fa';
 import { Avatar, Button, Dropdown, Navbar, NavbarToggle, TextInput } from 'flowbite-react';
 import { HiOutlineMenu } from 'react-icons/hi';
+import { useDispatch } from 'react-redux';
+import {toggleTheme} from '../redux/themeSlice.js';
 
 
 export default function Header() {
+    const dispatch = useDispatch();
+
     return (
         <nav className="border-b-2 px-4 py-2 flex items-center justify-between bg-white dark:bg-gray-800">
           {/* Sidebar Icon */}
@@ -41,7 +45,8 @@ export default function Header() {
                 <Button 
                     className='w-12 h-10 hidden sm:inline' 
                     color='gray' 
-                    pill>
+                    pill
+                    onClick={() => dispatch(toggleTheme())}>
                     <FaMoon />
                 </Button>
             </div>

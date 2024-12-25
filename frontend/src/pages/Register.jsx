@@ -51,7 +51,7 @@ export default function Register() {
 
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col justify-center items-center px-4">
+    <div className="h-screen flex flex-col justify-center items-center px-4">
       <div className="flex flex-col lg:flex-row items-center lg:items-start w-full lg:w-3/4">
         <div className="flex flex-col items-center lg:items-start w-full lg:w-1/2 -mt-10">
           <h1 className="text-4xl font-bold mb-8 text-center lg:text-left">ToolShare</h1>
