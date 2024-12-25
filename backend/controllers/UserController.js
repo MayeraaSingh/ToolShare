@@ -10,7 +10,7 @@ class UserController {
             // Check if the email already exists
             let user = await UserModel.findByEmail(email);
             if (user) {
-                next(errorHandler(400, 'User already exists'));
+                res.status(200).json({ message: 'User registered successfully', user });
             }
 
             // Create a new user with just the email
