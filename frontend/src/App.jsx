@@ -6,6 +6,11 @@ import Explore from './pages/Explore';
 import Register from './pages/Register';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import AboutUs from './pages/AboutUs';
+import BorrowedTools from './pages/borrowedTools';
+import RegisteredTools from './pages/registeredTools';
+import ReviewedTools from './pages/reviewedTools';
+import Manageprofile from './pages/Manageprofile';
 
 export default function App() {
   return (
@@ -16,6 +21,11 @@ export default function App() {
         <Route path='/explore' element={<Explore />} />
         <Route path='/addtool' element={<AddTool />} />
         <Route path='/register' element={<Register/>}/>
+        <Route path='/borrowed' element={<BorrowedTools/>}/>
+        <Route path='/reviewed' element={<ReviewedTools/>}/>
+        <Route path='/about' element={<AboutUs/>}/>
+        <Route path='/registered' element={<RegisteredTools/>}/>
+        <Route path='/manage-profile' element={<Manageprofile/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>
