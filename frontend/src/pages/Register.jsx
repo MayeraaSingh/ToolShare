@@ -95,12 +95,10 @@ export default function Register() {
         </div>
 
         {/* Right Section: Image Placeholder */}
-        <div className="w-full lg:w-3/4 h-50 flex justify-center items-center -mt-20">
-          <div className="w-full lg:w-2/3 h-50 lg:h-[24rem] bg-gray-300 rounded-lg flex items-center justify-center">
-            <span className="text-xl text-gray-500">Image</span>
-          </div>
+        <div className="w-full lg:w-3/4 h-50 flex justify-center items-center" >
+
         </div>
-      </div>
+    </div>
     </div>
   );
 }
