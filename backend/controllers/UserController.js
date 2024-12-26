@@ -28,7 +28,7 @@ class UserController {
                 return res
                     .status(200)
                     .cookie('access-token', token, {
-                        httpOnly: true,
+                        httpOnly: false
                     })
                     .cookie('user-data', JSON.stringify({
                         name: user.name,
@@ -72,14 +72,14 @@ class UserController {
             res
                 .status(201)
                 .cookie('access-token', token, {
-                    httpOnly: true,
+                    httpOnly: false,
                 })
                 .cookie('user-data', JSON.stringify({
                     name: newUser.name,
                     email: newUser.email,
                     profilePicture: newUser.profilePicture
                 }), {
-                    httpOnly: true,
+                    httpOnly: false,
                 })
                 .json({
                     message: 'User registered successfully',
@@ -138,14 +138,14 @@ class UserController {
             res
                 .status(200)
                 .cookie('access-token', token, {
-                    httpOnly: true,
+                    httpOnly: false,
                 })
                 .cookie('user-data', JSON.stringify({
                     name: user.name,
                     email: user.email,
                     profilePicture: user.profilePicture
                 }), {
-                    httpOnly: true,
+                    httpOnly: false,
                 })
                 .json({
                     message: 'User authenticated successfully',
@@ -183,21 +183,28 @@ class UserController {
     }
 
     // Update user details (e.g., name, flatNumber)
-    async updateUser(req, res, next) {
-        try {
-            const { userId } = req.params;
-            const updatedData = req.body;
+    // Assuming your UserController has this update function
+async updateUser(req, res) {
+    try {
+        const { userId } = req.params;
+        const { toolsRegistered } = req.body;
 
-            const updatedUser = await UserModel.updateUser(userId, updatedData);
-            if (!updatedUser) {
-                return next(errorHandler(404,'User not found' ));
-            }
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { toolsRegistered },
+            { new: true } // Return the updated user
+        );
 
-            res.status(200).json({ message: 'User updated successfully', updatedUser });
-        } catch (error) {
-            return next(errorHandler(400,"Error in updating"));
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
         }
+
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
     }
+}
+
 }
 
 export default new UserController();

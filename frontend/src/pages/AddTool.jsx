@@ -1,86 +1,77 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { TextInput, Textarea, FileInput, Button } from 'flowbite-react';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateStart, updateSuccess, updateFailure } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
+import {Button,TextInput,Textarea,FileInput} from "flowbite-react";
 
-const AddToolPage = () => {
-    const currentUser = useSelector((state) => state.user); // Assuming user details are stored in Redux
+const AddTool = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const currentUser = useSelector((state) => state.user.currentUser);
     const [toolData, setToolData] = useState({
-        productName: '',
-        description: '',
-        owner: currentUser?.name || '',
-        flatNumber: currentUser?.flatNumber || '',
-        image: '',
-        max: 1,
-        price: 0.0,
+        owner: currentUser ? currentUser.name : "",
+        flatNumber: "",
+        productName: "",
+        description: "",
+        image: null,
+        max: 0,
+        price: 0,
     });
 
-    // Handle form input change
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setToolData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setToolData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    // Handle file input change
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setToolData((prev) => ({
-            ...prev,
-            image: file,
-        }));
+        setToolData((prevData) => ({ ...prevData, image: e.target.files[0] }));
     };
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      if (!currentUser) {
-          alert('Please sign in to add a tool');
-          return;
-      }
-  
-      const { productName, description, image, flatNumber, max, price } = toolData;
-  
-      try {
-          const response = await fetch('/api/tools/add', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  name: productName,
-                  description,
-                  owner: currentUser._id,  // Pass current user's ID
-                  flatNumber,
-                  image,
-                  max,
-                  price,
-              }),
-          });
-  
-          const data = await response.json();
-  
-          if (response.ok) {
-              setToolData({
-                  productName: '',
-                  description: '',
-                  image: '',
-                  max: 1,
-                  price: 0.00,
-                  flatNumber: '',
-              });
-  
-              alert('Tool added successfully!');
-          } else {
-              alert(`Error: ${data.message}`);
-          }
-      } catch (error) {
-          console.error('Error adding tool:', error);
-          alert('Failed to add the tool');
-      }
-  };
-  
+        e.preventDefault();
+
+        if (!currentUser) {
+            alert("User not authenticated");
+            return;
+        }
+
+        // Prepare form data to send to the server
+        const formData = new FormData();
+        formData.append("owner", toolData.owner);
+        formData.append("flatNumber", toolData.flatNumber);
+        formData.append("productName", toolData.productName);
+        formData.append("description", toolData.description);
+        formData.append("image", toolData.image);
+        formData.append("max", toolData.max);
+        formData.append("price", toolData.price);
+
+        try {
+            dispatch(updateStart());
+
+            const response = await fetch("http://localhost:3000/api/tools/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                dispatch(updateSuccess(data.user)); // Assuming the response contains updated user data
+                alert("Tool added successfully!");
+                navigate("/profile"); // Redirect to profile or another page after adding
+            } else {
+                dispatch(updateFailure(data.message));
+                alert("Failed to add tool.");
+            }
+        } catch (error) {
+            dispatch(updateFailure(error.message));
+            alert("An error occurred. Please try again.");
+        }
+    };
 
     return (
         <div className="w-full max-w-xl mx-auto p-6 bg-white dark:bg-gray-800">
@@ -90,10 +81,7 @@ const AddToolPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Owner Name */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="owner"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="owner">
                         Owner Name
                     </label>
                     <TextInput
@@ -108,10 +96,7 @@ const AddToolPage = () => {
 
                 {/* Flat Number */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="flatNumber"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="flatNumber">
                         Flat Number
                     </label>
                     <TextInput
@@ -126,10 +111,7 @@ const AddToolPage = () => {
 
                 {/* Product Name */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="productName"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="productName">
                         Product Name
                     </label>
                     <TextInput
@@ -144,10 +126,7 @@ const AddToolPage = () => {
 
                 {/* Description */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="description"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="description">
                         Description
                     </label>
                     <Textarea
@@ -163,10 +142,7 @@ const AddToolPage = () => {
 
                 {/* Product Image */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="image"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="image">
                         Product Image
                     </label>
                     <FileInput
@@ -181,10 +157,7 @@ const AddToolPage = () => {
 
                 {/* Max Rent Period */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="max"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="max">
                         Maximum Rental Period (in days)
                     </label>
                     <TextInput
@@ -201,10 +174,7 @@ const AddToolPage = () => {
 
                 {/* Rent Price */}
                 <div className="mb-4">
-                    <label
-                        className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300"
-                        htmlFor="price"
-                    >
+                    <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300" htmlFor="price">
                         Rent Price (in INR)
                     </label>
                     <TextInput
@@ -233,4 +203,4 @@ const AddToolPage = () => {
     );
 };
 
-export default AddToolPage;
+export default AddTool;

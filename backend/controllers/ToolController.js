@@ -4,23 +4,12 @@ class ToolController {
     // Add a new tool
     async addTool(req, res, next) {
         try {
-            // Destructure the required fields from the request body
-            const { 
-                name, 
-                description, 
-                owner, 
-                availability, 
-                max, 
-                price, 
-                image 
-            } = req.body;
-
-            // Validate required fields
+            const { name, description, owner, availability, max, price, image } = req.body;
+    
             if (!name || !description || !owner) {
                 return res.status(400).json({ message: 'Name, description, and owner are required.' });
             }
-
-            // Create a new tool document using the model
+    
             const tool = await ToolModel.create({
                 name,
                 description,
@@ -30,16 +19,13 @@ class ToolController {
                 price: price || 0.00, // default to 0.00 if not provided
                 image: image || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", // default image if not provided
             });
-
-            // Return a success response
+    
             res.status(201).json({ message: 'Tool added successfully', tool });
         } catch (error) {
             res.status(400).json({ message: 'Error adding tool', error: error.message });
         }
     }
-
-
-
+    
     // Get tool by ID
     async getToolById(req, res) {
         try {

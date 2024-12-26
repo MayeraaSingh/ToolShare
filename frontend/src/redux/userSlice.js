@@ -28,14 +28,20 @@ const userSlice = createSlice({
     },
     populateUserFromCookie: (state) => {
       const userData = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("user-data="))
-        ?.split("=")[1];
-
+          .split("; ")
+          .find((row) => row.startsWith("user-data="))
+          ?.split("=")[1];
+  
       if (userData) {
-        state.currentUser = JSON.parse(decodeURIComponent(userData));
+          state.currentUser = JSON.parse(decodeURIComponent(userData));
+  
+          // Ensure toolsOwned is an array if not already
+          if (!Array.isArray(state.currentUser.toolsOwned)) {
+              state.currentUser.toolsOwned = [];
+          }
       }
-    },
+  },
+  
     updateStart: (state) => {
       state.loading = true;
       state.error =null;
