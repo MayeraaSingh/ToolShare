@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentUser: null,
+  currentUser: null, // To hold structured user data
   error: null,
   loading: false,
 };
@@ -15,7 +15,8 @@ const userSlice = createSlice({
       state.error = null;
     },
     registerSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      // Ensure the payload has the expected structure
+      state.currentUser = action.payload?.user || null;
       state.loading = false;
       state.error = null;
     },
@@ -28,45 +29,41 @@ const userSlice = createSlice({
     },
     populateUserFromCookie: (state) => {
       const userData = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("user-data="))
-          ?.split("=")[1];
-  
+        .split("; ")
+        .find((row) => row.startsWith("user-data="))
+        ?.split("=")[1];
+
       if (userData) {
-          state.currentUser = JSON.parse(decodeURIComponent(userData));
-  
-          // Ensure toolsOwned is an array if not already
-          if (!Array.isArray(state.currentUser.toolsOwned)) {
-              state.currentUser.toolsOwned = [];
-          }
+        const parsedData = JSON.parse(decodeURIComponent(userData));
+        state.currentUser = parsedData?.user || null; // Only take the `user` object
       }
-  },
-  
+    },
     updateStart: (state) => {
       state.loading = true;
-      state.error =null;
+      state.error = null;
     },
-    updateSuccess: (state,action) => {
-        state.currentUser = action.payload;
-        state.loading = false;
-        state.error = null;
+    updateSuccess: (state, action) => {
+      state.currentUser = action.payload?.user || null; // Ensure updated structure
+      state.loading = false;
+      state.error = null;
     },
-    
-    updateFailure: (state,action) => {
-        state.loading = false;
-        state.error = action.payload;
+    updateFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     },
   },
 });
 
+// Exporting the reducers
 export const {
   registerStart,
-  registerSuccess,updateStart,
-  updateSuccess,updateFailure,
+  registerSuccess,
+  updateStart,
+  updateSuccess,
+  updateFailure,
   registerFailure,
   clearError,
   populateUserFromCookie,
-  
 } = userSlice.actions;
 
 export default userSlice.reducer;
