@@ -9,8 +9,9 @@ class UserModel {
                 flatNumber: { type: String}, // New field for flat number
                 toolsBorrowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools borrowed by the user
                 toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
-                profilePicture: { type: String,
-                    default:"https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
+                toolsReviewed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools reviewed by the user
+                profilePicture:{ type: String,
+                    default:"htt ps://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
                 },
             },
             { timestamps: true }
@@ -27,7 +28,10 @@ class UserModel {
 
     // Find user by email
     async findByEmail(email) {
-        return await this.model.findOne({ email }).populate('tools');
+        return await this.model.findOne({ email })
+            .populate('toolsBorrowed')
+            .populate('toolsOwned')
+            .populate('toolsReviewed');
     }
 
     // Update user details
@@ -37,7 +41,9 @@ class UserModel {
 
     // Find user by flat number (optional utility method)
     async findByFlatNumber(flatNumber) {
-        return await this.model.findOne({ flatNumber }).populate('tools');
+        return await this.model.findOne({ flatNumber }).populate('toolsBorrowed')
+            .populate('toolsOwned')
+            .populate('toolsReviewed');
     }
 }
 

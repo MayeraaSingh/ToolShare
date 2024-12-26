@@ -7,15 +7,15 @@ class UserController {
     async register(req, res, next) {
         try {
             const { email } = req.body;
-
+    
             // Validate email input
             if (!email) {
                 return next(errorHandler(400, "Email is required"));
             }
-
+    
             // Check if the email already exists
             const user = await UserModel.findByEmail(email);
-
+    
             if (user) {
                 // If user exists, treat as login
                 // Generate JWT token
@@ -24,51 +24,74 @@ class UserController {
                     process.env.JWT_SECRET, // Use a secret key from environment variables
                     { expiresIn: '7d' } // Token expiry (e.g., 7 days)
                 );
-
-                res
+    
+                return res
                     .status(200)
-                    .cookie('access-token',token,{
-                        httpOnly:true,
+                    .cookie('access-token', token, {
+                        httpOnly: true,
                     })
-                    .json({
-                    message: 'User logged in successfully',
-                    user: {
-                        id: user._id,
+                    .cookie('user-data', JSON.stringify({
                         name: user.name,
                         email: user.email,
-                        profilePicture: user.profilePicture,
-                    },
-                });
+                        profilePicture: user.profilePicture
+                    }), {
+                        httpOnly: false,
+                    })
+                    .json({
+                        message: 'User logged in successfully',
+                        user: {
+                            id: user._id,
+                            name: user.name,
+                            email: user.email,
+                            profilePicture: user.profilePicture,
+                            flatNumber: user.flatNumber,
+                            toolsBorrowed: user.toolsBorrowed,
+                            toolsOwned: user.toolsOwned,
+                            toolsReviewed: user.toolsReviewed,
+                        },
+                    });
             }
-
+    
             // Create a new user if not found
-            const newuser = await UserModel.createUser({
+            const newUser = await UserModel.createUser({
                 email,
                 profilePicture: "", // Empty initially, can be updated later
                 flatNumber: "", // Flat number can be updated later
                 toolsBorrowed: [], // Empty array for tools initially
                 toolsOwned: [],
+                toolsReviewed: [],
             });
-
+    
             // Generate JWT token for new user
             const token = jwt.sign(
-                { id: newuser._id, email: newuser.email },
+                { id: newUser._id, email: newUser.email },
                 process.env.JWT_SECRET, // Use a secret key from environment variables
-                { expiresIn: '7d' } // Token expiry 
+                { expiresIn: '7d' } // Token expiry
             );
-
+    
             res
                 .status(201)
-                .cookie('access-token',token,{
-                    httpOnly:true,
+                .cookie('access-token', token, {
+                    httpOnly: true,
+                })
+                .cookie('user-data', JSON.stringify({
+                    name: newUser.name,
+                    email: newUser.email,
+                    profilePicture: newUser.profilePicture
+                }), {
+                    httpOnly: true,
                 })
                 .json({
                     message: 'User registered successfully',
                     user: {
-                        id: newuser._id,
-                        name: newuser.name,
-                        email: newuser.email,
-                        profilePicture: newuser.profilePicture,
+                        id: newUser._id,
+                        name: newUser.name,
+                        email: newUser.email,
+                        profilePicture: newUser.profilePicture,
+                        flatNumber: newUser.flatNumber,
+                        toolsBorrowed: newUser.toolsBorrowed,
+                        toolsOwned: newUser.toolsOwned,
+                        toolsReviewed: newUser.toolsReviewed,
                     },
                 });
         } catch (error) {
@@ -76,58 +99,72 @@ class UserController {
             return next(errorHandler(500, error.message || 'An unexpected error occurred'));
         }
     }
+    
 
-
+    // Register user with Google
     async registerGoogle(req, res, next) {
         try {
             const { name, email, googlePhotoUrl } = req.body;
-
+    
             // Validate input
             if (!name || !email || !googlePhotoUrl) {
                 return next(errorHandler(400, 'All fields (name, email, photo) are required'));
             }
-
+    
             // Check if user exists
-            const user = await UserModel.findByEmail(email);
-
+            let user = await UserModel.findByEmail(email);
+    
             if (!user) {
                 // Create a new user if not found
-                user = await UserModel.createUser({
+                user = await UserModel.create({
                     name,
                     email,
-                    profilePicture: googlePhotoUrl 
+                    profilePicture: googlePhotoUrl,
+                    flatNumber: "", // Can be updated later
+                    toolsBorrowed: [],
+                    toolsOwned: [],
+                    toolsReviewed: [],
                 });
             }
-
+    
             // Generate JWT token
             const token = jwt.sign(
                 { id: user._id, email: user.email },
                 process.env.JWT_SECRET, // Use a secret key from environment variables
                 { expiresIn: '7d' } // Token expiry (e.g., 7 days)
             );
-
+    
             // Send response
             res
                 .status(200)
-                .cookie('access-token',token,{
+                .cookie('access-token', token, {
+                    httpOnly: true,
+                })
+                .cookie('user-data', JSON.stringify({
+                    name: user.name,
+                    email: user.email,
+                    profilePicture: user.profilePicture
+                }), {
                     httpOnly: true,
                 })
                 .json({
                     message: 'User authenticated successfully',
                     user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    profilePicture: user.profilePicture,
-                    flatNumber: user.flatNumber,
-                    toolsBorrowed,
-                    toolsOwned
+                        id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        profilePicture: user.profilePicture,
+                        flatNumber: user.flatNumber,
+                        toolsBorrowed: user.toolsBorrowed,
+                        toolsOwned: user.toolsOwned,
+                        toolsReviewed: user.toolsReviewed,
                     },
                 });
         } catch (error) {
             next(errorHandler(500, error.message || 'An unexpected error occurred'));
         }
     }
+    
 
     // Get user by email
     async getUserByEmail(req, res, next) {
@@ -146,19 +183,19 @@ class UserController {
     }
 
     // Update user details (e.g., name, flatNumber)
-    async updateUser(req, res) {
+    async updateUser(req, res, next) {
         try {
             const { userId } = req.params;
             const updatedData = req.body;
 
             const updatedUser = await UserModel.updateUser(userId, updatedData);
             if (!updatedUser) {
-                return res.status(404).json({ message: 'User not found' });
+                return next(errorHandler(404,'User not found' ));
             }
 
             res.status(200).json({ message: 'User updated successfully', updatedUser });
         } catch (error) {
-            res.status(400).json({ message: 'Error updating user', error: error.message });
+            return next(errorHandler(400,"Error in updating"));
         }
     }
 }

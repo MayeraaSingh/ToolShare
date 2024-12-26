@@ -2,15 +2,43 @@ import ToolModel from '../models/Tool.js';
 
 class ToolController {
     // Add a new tool
-    async addTool(req, res) {
+    async addTool(req, res, next) {
         try {
-            const { name, category, owner } = req.body;
-            const tool = await ToolModel.createTool({ name, category, owner });
+            // Destructure the required fields from the request body
+            const { 
+                name, 
+                description, 
+                owner, 
+                availability, 
+                max, 
+                price, 
+                image 
+            } = req.body;
+
+            // Validate required fields
+            if (!name || !description || !owner) {
+                return res.status(400).json({ message: 'Name, description, and owner are required.' });
+            }
+
+            // Create a new tool document using the model
+            const tool = await ToolModel.create({
+                name,
+                description,
+                owner,
+                availability: availability !== undefined ? availability : true, // default to true if not provided
+                max: max || 1, // default to 1 if not provided
+                price: price || 0.00, // default to 0.00 if not provided
+                image: image || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", // default image if not provided
+            });
+
+            // Return a success response
             res.status(201).json({ message: 'Tool added successfully', tool });
         } catch (error) {
             res.status(400).json({ message: 'Error adding tool', error: error.message });
         }
     }
+
+
 
     // Get tool by ID
     async getToolById(req, res) {
