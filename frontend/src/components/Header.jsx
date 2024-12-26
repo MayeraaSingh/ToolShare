@@ -95,16 +95,41 @@ export default function Header() {
                             <FaBell />
                         </Button>
                         {isNotificationsOpen && (
+                        <div
+                            className="absolute top-full mt-2 bg-white dark:bg-gray-700 shadow-lg rounded-lg p-4 w-64 z-50 -translate-x-4"
+                            onMouseEnter={() => clearTimeout()} // Cancel timeout on hover
+                            onMouseLeave={() => setTimeout(() => setIsNotificationsOpen(false), 5000)} // Close after 5 seconds
+                        >
+                            {[
+                            {
+                                title: "Return Reminder: Your Rental is Due Tomorrow!",
+                                body: "Hi Priya, don’t forget to return the Dyson V15 Vacuum Cleaner to Ramesh, Apartment #205, by tomorrow to avoid late fees.",
+                            },
+                            {
+                                title: "New Request for Your Tool!",
+                                body: "Arjun from Apartment #310 wants to borrow your Philips Hair Dryer from Dec 26 to Dec 27. Review their request and approve or decline it now!",
+                            },
+                            {
+                                title: "Hot Tools in Your Community!",
+                                body: "Looking for a Camping Tent? Check out these popular tools recently listed in your area: Canon EOS 90D Camera, Sewing Machine, and Inalsa Air Fryer.",
+                            },
+                            ].map((notification, index) => (
                             <div
-                                className="absolute top-full mt-2 bg-white dark:bg-gray-700 shadow-lg rounded-lg p-4 w-64 z-50"
-                                onMouseEnter={() => clearTimeout()} // Cancel timeout on hover
-                                onMouseLeave={() => setTimeout(() => setIsNotificationsOpen(false), 5000)} // Close after 5 seconds
+                                key={index}
+                                className="mb-4 last:mb-0 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
                             >
-                                <p className="text-sm p-5">Notification 1</p>
-                                <p className="text-sm p-5">Notification 2</p>
-                                <p className="text-sm p-5">Notification 3</p>
+                                <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                                {notification.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {notification.body}
+                                </p>
                             </div>
+                            ))}
+                        </div>
                         )}
+
+
                     </div>
 
                     {/* User Icon */}

@@ -116,7 +116,7 @@ class UserController {
     
             if (!user) {
                 // Create a new user if not found
-                user = await UserModel.create({
+                user = await UserModel.createUser({
                     name,
                     email,
                     profilePicture: googlePhotoUrl,

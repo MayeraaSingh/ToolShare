@@ -5,7 +5,7 @@ class UserModel {
         const userSchema = new mongoose.Schema(
             {
                 name: { type: String },
-                email: { type: String, required: true, unique: true },
+                email: { type: String, unique: true },
                 flatNumber: { type: String}, // New field for flat number
                 toolsBorrowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools borrowed by the user
                 toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
@@ -25,6 +25,13 @@ class UserModel {
         const user = new this.model(userData);
         return await user.save();
     }
+
+    async findByName(name) {
+        return await this.model.findOne({ name })
+            .populate('toolsBorrowed')
+            .populate('toolsOwned')
+            .populate('toolsReviewed');
+    }    
 
     // Find user by email
     async findByEmail(email) {
