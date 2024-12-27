@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { registerStart, registerSuccess, registerFailure } from "../redux/userSlice"; // Correct path to your userSlice actions
 import OAuth from "../components/OAuth";
+import loginImage from './login.jpg';
 
 export default function Register() {
   const [email, setEmail] = useState(""); // State to hold user input
@@ -50,14 +51,14 @@ export default function Register() {
     }
   };
 
-
   return (
     <div className="h-screen flex flex-col justify-center items-center px-4">
       <div className="flex flex-col lg:flex-row items-center lg:items-start w-full lg:w-3/4">
-        <div className="flex flex-col items-center lg:items-start w-full lg:w-1/2 -mt-10">
-          <h1 className="text-4xl font-bold mb-8 text-center lg:text-left">ToolShare</h1>
-
+        {/* Left Section */}
+        <div className="flex flex-col items-center lg:items-start w-full lg:w-1/2 mt-10">
           <div className="flex flex-col items-center lg:items-start w-full lg:w-3/4">
+            <h1 className="text-4xl font-bold mb-8 text-center">ToolShare</h1>
+
             {/* Email Input */}
             <div className="mb-6 w-full">
               <TextInput
@@ -73,7 +74,7 @@ export default function Register() {
 
             {/* Register Button */}
             <div className="mb-6 w-full">
-              <Button 
+              <Button
                 type="button"
                 size="lg"
                 className="w-full"
@@ -95,10 +96,16 @@ export default function Register() {
         </div>
 
         {/* Right Section: Image Placeholder */}
-        <div className="w-full lg:w-3/4 h-50 flex justify-center items-center" >
-
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+          <div className="relative w-full lg:w-[70%]">
+            <img
+              src={loginImage}
+              alt="Login Image"
+              className="object-contain w-full h-auto"
+            />
+          </div>
         </div>
-    </div>
+      </div>
     </div>
   );
 }

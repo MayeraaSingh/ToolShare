@@ -1,15 +1,22 @@
 import React from 'react'
 
+
 export default function AboutUs() {
-    const backgroundImage = 'url(/login.jpg)'; // Replace with your image path
+  
 
     return (
         <>
-        <section 
-        className="bg-gray-100 dark:bg-gray-900" 
-        style={{ backgroundImage, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.7 }} 
-        > 
+        <section
+          className="bg-gray-100 dark:bg-gray-900"
+          style={{
+            backgroundImage: `url('/path-to-your-image.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.7,
+          }}
+        >
         </section>
+
 
         <section className="container mx-auto py-16">
           <h2 className="text-3xl text-teal-500 font-bold text-center mb-8">About Us</h2>
