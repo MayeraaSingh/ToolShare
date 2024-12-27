@@ -11,4 +11,16 @@ router.get('/:toolId', ToolController.getToolById);
 // Route to update tool details
 router.put('/:toolId', ToolController.updateTool);
 
+// Fetch all tools
+router.get('/gettools', async (req, res) => {
+    try {
+      const tools = await Tool.find(); // This fetches all tools from MongoDB
+      res.json(tools);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
+  });
+  
+
 export default router;

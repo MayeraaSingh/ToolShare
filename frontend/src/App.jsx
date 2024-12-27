@@ -13,6 +13,8 @@ import BorrowedTools from './pages/borrowedTools';
 import RegisteredTools from './pages/registeredTools';
 import ReviewedTools from './pages/reviewedTools';
 import Manageprofile from './pages/Manageprofile';
+import SearchResultsPage from './pages/SearchResults';
+
 
 export default function App() {
   const dispatch = useDispatch();
@@ -35,6 +37,7 @@ export default function App() {
         <Route path='/about' element={<AboutUs />} />
         <Route path='/registered' element={<RegisteredTools />} />
         <Route path='/manage-profile' element={<Manageprofile />} />
+        <Route path="/search" element={<SearchResultsPage />} />
       </Routes>
       <Footer />
     </BrowserRouter>
