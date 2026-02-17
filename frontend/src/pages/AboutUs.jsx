@@ -1,19 +1,10 @@
-import React from 'react'
-
-
 export default function AboutUs() {
   
 
     return (
         <>
         <section
-          className="bg-gray-100 dark:bg-gray-900"
-          style={{
-            backgroundImage: `url('/path-to-your-image.jpg')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.7,
-          }}
+          className="bg-gray-100 dark:bg-gray-900 py-12"
         >
         </section>
 

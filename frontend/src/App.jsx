@@ -15,6 +15,7 @@ import RegisteredTools from './pages/RegisteredTools';
 import ReviewedTools from './pages/ReviewedTools';
 import Manageprofile from './pages/Manageprofile';
 import SearchResultsPage from './pages/SearchResults';
+import Tool from './pages/Tool';
 
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
         <Route path='/registered' element={<RegisteredTools />} />
         <Route path='/manage-profile' element={<Manageprofile />} />
         <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/tool/:toolId" element={<Tool />} />
       </Routes>
       <Footer />
     </BrowserRouter>
