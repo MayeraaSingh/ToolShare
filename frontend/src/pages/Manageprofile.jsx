@@ -1,16 +1,17 @@
 import { Alert, Button, TextInput } from 'flowbite-react';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase'; 
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import toast from 'react-hot-toast';
 import { updateFailure, updateStart, updateSuccess } from '../redux/userSlice';
 
 
 export default function DashProfile() {
   const dispatch = useDispatch();
-  const {currentUser: user, loading, error} = useSelector((state) => state.user); 
+  const {currentUser: user, loading} = useSelector((state) => state.user); 
 
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(user?.profilePicture || ''); 
@@ -22,8 +23,6 @@ export default function DashProfile() {
     email: user?.email || '',
     flat: user?.flat || '',
   }); 
-  const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
-  const [updateUserError, setUpdateUserError] = useState(null);
   const filePickerRef = useRef();
 
   const handleImageChange = (e) => {
@@ -56,6 +55,7 @@ export default function DashProfile() {
       },
       (error) => {
         setImageFileError('Could not upload image');
+        toast.error('Could not upload image');
         setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(null);
@@ -67,9 +67,11 @@ export default function DashProfile() {
             setImageFileUrl(downloadURL);
             setFormData({ ...formData, profilePicture: downloadURL });
             setImageFileUploading(false);
+            toast.success('Image uploaded successfully!');
           })
           .catch((error) => {
             setImageFileError('Error getting download URL');
+            toast.error('Error getting download URL');
             setImageFileUploading(false);
           });
       }
@@ -82,16 +84,14 @@ export default function DashProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setUpdateUserSuccess(null);
-    setUpdateUserError(null);
 
     if (Object.keys(formData).length === 0) {
-      setUpdateUserError('No changes made');
+      toast.error('No changes made');
       return;
     }
 
     if (imageFileUploading) {
-      setUpdateUserError('Image is uploading, please wait');
+      toast.error('Image is uploading, please wait');
       return;
     }
 
@@ -106,16 +106,16 @@ export default function DashProfile() {
       if (!res.ok) {
         const data = await res.json(); 
         dispatch(updateFailure(data.message));
-        setUpdateUserError(data.message);
+        toast.error(data.message || 'Failed to update profile');
       } else {
         const data = await res.json();
         dispatch(updateSuccess(data));
-        setUpdateUserSuccess("Profile updated successfully");
+        toast.success('Profile updated successfully!');
       }
     } catch (error) {
       console.error(error);
       dispatch(updateFailure(error.message));
-      setUpdateUserError(error.message);
+      toast.error(error.message || 'An error occurred');
     }
   };
 

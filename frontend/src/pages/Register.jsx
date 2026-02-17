@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, TextInput } from "flowbite-react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import { registerStart, registerSuccess, registerFailure } from "../redux/userSlice"; // Correct path to your userSlice actions
 import OAuth from "../components/OAuth";
 import loginImage from './login.jpg';
@@ -11,7 +12,6 @@ export default function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Navigation hook for routing
   const [loading, setLoading] = useState(false); // Optional, to handle loading state
-  const [error, setError] = useState(""); // To handle any errors from the API
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -22,7 +22,6 @@ export default function Register() {
     e.preventDefault();
     dispatch(registerStart()); // Start loading
     setLoading(true); // Set loading state to true
-    setError(""); // Reset error state
 
     try {
       const response = await fetch("http://localhost:3000/api/users/register", {
@@ -41,11 +40,12 @@ export default function Register() {
 
       const data = await response.json();
       dispatch(registerSuccess(data.user)); // Dispatch success action with user data
+      toast.success('Registration successful!');
       navigate("/"); // Redirect to home page after successful registration
     } catch (error) {
       // Dispatch failure if the registration fails
       dispatch(registerFailure(error.message));
-      setError(error.message); // Display error to user
+      toast.error(error.message || 'Registration failed');
     } finally {
       setLoading(false); // Set loading state to false after request completes
     }
@@ -84,9 +84,6 @@ export default function Register() {
                 {loading ? "Registering..." : "Register"}
               </Button>
             </div>
-
-            {/* Display error message if any */}
-            {error && <p className="text-red-500 text-sm">{error}</p>}
 
             {/* Google Register Button */}
             <div className="w-full">

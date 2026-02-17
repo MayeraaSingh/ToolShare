@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import toast from 'react-hot-toast';
 import { updateStart, updateSuccess, updateFailure } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { Button, TextInput, Textarea, FileInput } from "flowbite-react";
@@ -17,7 +18,6 @@ export default function AddTool(){
         max: 1,
         price: 0,
     });
-    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -29,7 +29,7 @@ export default function AddTool(){
         const maxSize = 5 * 1024 * 1024; // 5 MB
 
         if (file.size > maxSize) {
-            alert("File size exceeds the 5 MB limit. Please choose a smaller file.");
+            toast.error("File size exceeds the 5 MB limit. Please choose a smaller file.");
             return;
         }
 
@@ -41,17 +41,18 @@ export default function AddTool(){
                 useWebWorker: true,
             });
             setToolData((prevData) => ({ ...prevData, image: compressedFile }));
+            toast.success("Image compressed successfully!");
         } catch (error) {
+            toast.error("Image compression failed. Please try another image.");
             console.error("Image compression failed:", error);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
 
         if (!currentUser || !currentUser.id) {
-            setError("User not authenticated");
+            toast.error("User not authenticated. Please log in.");
             return;
         }
 
@@ -77,15 +78,15 @@ export default function AddTool(){
 
             if (response.ok) {
                 dispatch(updateSuccess(currentUser));
-                alert("Tool added successfully!");
+                toast.success("Tool added successfully!");
                 navigate("/explore");
             } else {
                 dispatch(updateFailure(data.message));
-                setError(data.message || "Failed to add tool.");
+                toast.error(data.message || "Failed to add tool.");
             }
         } catch (error) {
             dispatch(updateFailure(error.message));
-            setError("An error occurred. Please try again.");
+            toast.error("An error occurred. Please try again.");
         }
     };
 
@@ -95,9 +96,6 @@ export default function AddTool(){
                 Register a New Tool
             </h1>
             <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-                <div className="text-red-600 text-sm text-center">{error}</div>
-            )}
             {/* Product Name */}
             <div>
                 <label htmlFor="name" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
