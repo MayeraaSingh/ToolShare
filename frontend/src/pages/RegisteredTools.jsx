@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ToolCard from '../components/ToolCard';  // Import ToolCard component
 
 const RegisteredTools = () => {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Assume you get the current user's email from a global state, context, or props
-  const currentUserEmail = "user@example.com";  // Replace with dynamic email
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     // Fetch the tools owned by the current user
     const fetchTools = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await fetch(`/api/tools/owned/${currentUserEmail}`);
+        const response = await fetch(`/api/tools/owned/${currentUser.id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch tools');
         }
         const data = await response.json();
-        setTools(data.toolsOwned);
+        setTools(data);
       } catch (err) {
         alert('Error fetching tools. Please try again later.');
       } finally {
@@ -26,7 +29,7 @@ const RegisteredTools = () => {
     };
 
     fetchTools();
-  }, [currentUserEmail]);
+  }, [currentUser]);
 
   if (loading) {
     return <div>Loading...</div>;

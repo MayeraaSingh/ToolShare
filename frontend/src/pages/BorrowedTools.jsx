@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import ToolCard from '../components/ToolCard';  // Import ToolCard component
 
 const BorrowedTools = () => {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Assume you get the current user's email from a global state, context, or props
-  const currentUserEmail = "user@example.com";  // Replace with dynamic email
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     // Fetch the tools borrowed by the current user
     const fetchTools = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await fetch(`/api/tools/borrowed/${currentUserEmail}`);
+        const response = await fetch(`/api/tools/borrowed/${currentUser.id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch borrowed tools');
         }
         const data = await response.json();
-        setTools(data.toolsBorrowed);  // Assuming your API returns an array called `toolsBorrowed`
+        setTools(data);  // Assuming your API returns an array
       } catch (err) {
         alert('Error fetching borrowed tools. Please try again later.');
       } finally {
@@ -26,7 +29,7 @@ const BorrowedTools = () => {
     };
 
     fetchTools();
-  }, [currentUserEmail]);
+  }, [currentUser]);
 
   if (loading) {
     return <div>Loading...</div>;
