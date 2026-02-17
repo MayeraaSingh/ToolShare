@@ -11,14 +11,13 @@ export default function AddTool(){
 
     const currentUser = useSelector((state) => state.user.currentUser);
     const [toolData, setToolData] = useState({
-        owner: currentUser ? currentUser.name : "",
-        flatNumber: "",
-        productName: "",
+        name: "",
         description: "",
         image: null,
-        max: 0,
+        max: 1,
         price: 0,
     });
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -49,38 +48,44 @@ export default function AddTool(){
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
 
-        if (!currentUser) {
-            alert("User not authenticated");
+        if (!currentUser || !currentUser.id) {
+            setError("User not authenticated");
             return;
         }
 
         const formData = new FormData();
-        Object.keys(toolData).forEach((key) => {
-            formData.append(key, toolData[key]);
-        });
+        formData.append('name', toolData.name);
+        formData.append('description', toolData.description);
+        formData.append('owner', currentUser.id);
+        formData.append('max', toolData.max);
+        formData.append('price', toolData.price);
+        if (toolData.image) {
+            formData.append('image', toolData.image);
+        }
 
         try {
             dispatch(updateStart());
 
-            const response = await fetch("http://localhost:3000/api/tools/add", {
+            const response = await fetch("/api/tools/add", {
                 method: "POST",
-                body: formData, // No 'Content-Type', as FormData sets it automatically
+                body: formData,
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                dispatch(updateSuccess(data.user)); // Assuming the response contains updated user data
+                dispatch(updateSuccess(currentUser));
                 alert("Tool added successfully!");
-                navigate("/");
+                navigate("/explore");
             } else {
                 dispatch(updateFailure(data.message));
-                alert("Failed to add tool.");
+                setError(data.message || "Failed to add tool.");
             }
         } catch (error) {
             dispatch(updateFailure(error.message));
-            alert("An error occurred. Please try again.");
+            setError("An error occurred. Please try again.");
         }
     };
 
@@ -90,41 +95,18 @@ export default function AddTool(){
                 Register a New Tool
             </h1>
             <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Owner Name */}
-            <div>
-                <label htmlFor="owner" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
-                Owner Name
-                </label>
-                <TextInput
-                id="owner"
-                name="owner"
-                value={toolData.owner}
-                onChange={handleChange}
-                required
-                />
-            </div>
-            {/* Flat Number */}
-            <div>
-                <label htmlFor="flatNumber" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
-                Flat Number
-                </label>
-                <TextInput
-                id="flatNumber"
-                name="flatNumber"
-                value={toolData.flatNumber}
-                onChange={handleChange}
-                required
-                />
-            </div>
+            {error && (
+                <div className="text-red-600 text-sm text-center">{error}</div>
+            )}
             {/* Product Name */}
             <div>
-                <label htmlFor="productName" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
-                Product Name
+                <label htmlFor="name" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
+                Tool Name
                 </label>
                 <TextInput
-                id="productName"
-                name="productName"
-                value={toolData.productName}
+                id="name"
+                name="name"
+                value={toolData.name}
                 onChange={handleChange}
                 required
                 />
@@ -153,13 +135,12 @@ export default function AddTool(){
                 name="image"
                 onChange={handleFileChange}
                 accept="image/png, image/jpeg"
-                required
                 />
             </div>
             {/* Max Rent Period */}
             <div>
                 <label htmlFor="max" className="block text-sm dark:text-gray-300 font-medium text-gray-700">
-                Maximum Rental Period (in days)
+                Maximum Quantity Available
                 </label>
                 <TextInput
                 type="number"
@@ -187,7 +168,7 @@ export default function AddTool(){
                 />
             </div>
             {/* Submit Button */}
-            <Button type="submit">Submit</Button>
+            <Button type="submit" className="w-full">Add Tool</Button>
         </form>
         </div>
     );
