@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Card } from 'flowbite-react';
+import ToolCard from '../components/ToolCard';
 
 const SearchResultsPage = () => {
   const [tools, setTools] = useState([]);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
 
   // Get the search query from the URL
   const queryParams = new URLSearchParams(location.search);
-  const query = queryParams.get('q') || ''; // Default to empty string if no query
+  const query = queryParams.get('q') || '';
 
   useEffect(() => {
     const fetchTools = async () => {
+      if (!query) {
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await fetch('/api/tools/search'); // Replace with your actual API endpoint
+        const response = await fetch(`/api/tools/search?q=${encodeURIComponent(query)}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -21,18 +26,17 @@ const SearchResultsPage = () => {
         setTools(data);
       } catch (error) {
         console.error('Error fetching tools:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchTools();
-  }, []);
+  }, [query]);
 
-  // Filter tools based on the search query
-  const filteredTools = tools.filter(
-    (tool) =>
-      tool.productName.toLowerCase().includes(query.toLowerCase()) ||
-      tool.flatNumber.toLowerCase().includes(query.toLowerCase())
-  );
+  if (loading) {
+    return <div className="w-full max-w-7xl mx-auto p-6">Loading...</div>;
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6">
@@ -41,7 +45,7 @@ const SearchResultsPage = () => {
       </h1>
 
       {/* No results message */}
-      {filteredTools.length === 0 && (
+      {tools.length === 0 && (
         <div className="text-center text-gray-600 dark:text-gray-300">
           <p>No tools found for your search term.</p>
         </div>
@@ -49,18 +53,16 @@ const SearchResultsPage = () => {
 
       {/* Tool Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {filteredTools.map((tool) => (
-          <Card key={tool.id} className="p-4 text-center w-full max-w-xs mx-auto">
-            <img
-              src={tool.productImage}
-              alt={tool.productName}
-              className="w-full h-32 object-cover mb-4 rounded-md"
-            />
-            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-              {tool.productName}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{tool.flatNumber}</p>
-          </Card>
+        {tools.map((tool) => (
+          <ToolCard
+            key={tool._id}
+            title={tool.name}
+            image={tool.image}
+            description={tool.description}
+            flatNumber={tool.owner?.flatNumber}
+            primaryButtonText="View"
+            primaryButtonAction={() => console.log('View tool', tool._id)}
+          />
         ))}
       </div>
     </div>

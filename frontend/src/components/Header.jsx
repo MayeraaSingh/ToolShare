@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaBell, FaUserCircle, FaMoon, FaHome } from 'react-icons/fa';
 import { Button, TextInput } from 'flowbite-react';
@@ -10,9 +10,11 @@ import DSidebar from './Sidebar.jsx';
 
 export default function Header() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Get current user from Redux
     const user = useSelector((state) => state.user.currentUser);
@@ -29,6 +31,13 @@ export default function Header() {
     const handleProfile = () => {
         setIsUserMenuOpen((prev) => !prev);
         setIsNotificationsOpen(false); // Close notifications dropdown when profile dropdown is toggled
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        }
     };
     
 
@@ -60,12 +69,14 @@ export default function Header() {
                 </Link>
 
                 {/* Search Bar */}
-                <form>
+                <form onSubmit={handleSearch}>
                     <TextInput
                         type="text"
                         placeholder="Search..."
                         rightIcon={AiOutlineSearch}
                         className="hidden lg:inline"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </form>
 
