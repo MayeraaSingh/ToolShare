@@ -183,27 +183,70 @@ class UserController {
     }
 
     // Update user details (e.g., name, flatNumber)
-    // Assuming your UserController has this update function
-async updateUser(req, res) {
-    try {
-        const { userId } = req.params;
-        const { toolsRegistered } = req.body;
+    async updateUser(req, res, next) {
+        try {
+            const { userId } = req.params;
+            const { name, email, flatNumber, profilePicture, toolsRegistered } = req.body;
 
-        const updatedUser = await UserModel.findByIdAndUpdate(
-            userId,
-            { toolsRegistered },
-            { new: true } // Return the updated user
-        );
+            const updatedUser = await UserModel.updateUser(userId, {
+                name,
+                email,
+                flatNumber,
+                profilePicture,
+                toolsRegistered
+            });
 
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            // Generate new JWT token with updated data
+            const token = jwt.sign(
+                { id: updatedUser._id, email: updatedUser.email },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
+
+            res
+                .status(200)
+                .cookie('access-token', token, { httpOnly: false })
+                .cookie('user-data', JSON.stringify({
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    profilePicture: updatedUser.profilePicture
+                }), { httpOnly: false })
+                .json({
+                    message: 'User updated successfully',
+                    user: updatedUser
+                });
+        } catch (error) {
+            next(errorHandler(500, error.message || 'Error updating user'));
         }
-
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating user', error: error.message });
     }
-}
+
+    // Get all users
+    async getAllUsers(req, res, next) {
+        try {
+            const users = await UserModel.getAllUsers();
+            res.status(200).json(users);
+        } catch (error) {
+            return next(errorHandler(500, error.message || 'Error fetching users'));
+        }
+    }
+
+    // Delete user
+    async deleteUser(req, res, next) {
+        try {
+            const { userId } = req.params;
+            const deletedUser = await UserModel.deleteUser(userId);
+            if (!deletedUser) {
+                return next(errorHandler(404, 'User not found'));
+            }
+            res.status(200).json({ message: 'User deleted successfully', deletedUser });
+        } catch (error) {
+            return next(errorHandler(500, error.message || 'Error deleting user'));
+        }
+    }
 
 }
 

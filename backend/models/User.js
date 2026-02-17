@@ -52,6 +52,27 @@ class UserModel {
             .populate('toolsOwned')
             .populate('toolsReviewed');
     }
+
+    // Get all users
+    async getAllUsers() {
+        return await this.model.find()
+            .populate('toolsBorrowed')
+            .populate('toolsOwned')
+            .populate('toolsReviewed');
+    }
+
+    // Find user by ID
+    async findById(userId) {
+        return await this.model.findById(userId)
+            .populate('toolsBorrowed')
+            .populate('toolsOwned')
+            .populate('toolsReviewed');
+    }
+
+    // Delete user
+    async deleteUser(userId) {
+        return await this.model.findByIdAndDelete(userId);
+    }
 }
 
 export default new UserModel();

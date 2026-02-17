@@ -34,6 +34,31 @@ class ToolModel {
     async updateTool(toolId, updatedData) {
         return await this.model.findByIdAndUpdate(toolId, updatedData, { new: true });
     }
+
+    // Get all tools
+    async getAllTools() {
+        return await this.model.find().populate('owner');
+    }
+
+    // Search tools by name or description
+    async searchTools(query) {
+        return await this.model.find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { description: { $regex: query, $options: 'i' } }
+            ]
+        }).populate('owner');
+    }
+
+    // Get tools by owner (user ID)
+    async getToolsByOwner(userId) {
+        return await this.model.find({ owner: userId }).populate('owner');
+    }
+
+    // Delete tool
+    async deleteTool(toolId) {
+        return await this.model.findByIdAndDelete(toolId);
+    }
 }
 
 export default new ToolModel();

@@ -54,6 +54,70 @@ class ToolController {
             res.status(400).json({ message: 'Error updating tool', error: error.message });
         }
     }
+
+    // Get all tools
+    async getAllTools(req, res) {
+        try {
+            const tools = await ToolModel.getAllTools();
+            res.status(200).json(tools);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching tools', error: error.message });
+        }
+    }
+
+    // Search tools
+    async searchTools(req, res) {
+        try {
+            const { q } = req.query;
+            if (!q) {
+                return res.status(400).json({ message: 'Search query is required' });
+            }
+            const tools = await ToolModel.searchTools(q);
+            res.status(200).json(tools);
+        } catch (error) {
+            res.status(500).json({ message: 'Error searching tools', error: error.message });
+        }
+    }
+
+    // Get tools by owner
+    async getToolsByOwner(req, res) {
+        try {
+            const { userId } = req.params;
+            const tools = await ToolModel.getToolsByOwner(userId);
+            res.status(200).json(tools);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching owned tools', error: error.message });
+        }
+    }
+
+    // Get borrowed tools by user
+    async getBorrowedToolsByUser(req, res) {
+        try {
+            const { userId } = req.params;
+            const UserModel = (await import('../models/User.js')).default;
+            const user = await UserModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.status(200).json(user.toolsBorrowed);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching borrowed tools', error: error.message });
+        }
+    }
+
+    // Delete tool
+    async deleteTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const deletedTool = await ToolModel.deleteTool(toolId);
+            if (!deletedTool) {
+                return res.status(404).json({ message: 'Tool not found' });
+            }
+            res.status(200).json({ message: 'Tool deleted successfully', deletedTool });
+        } catch (error) {
+            res.status(500).json({ message: 'Error deleting tool', error: error.message });
+        }
+    }
 }
 
 export default new ToolController();
