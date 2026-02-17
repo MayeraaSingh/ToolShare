@@ -5,7 +5,15 @@ import userRoutes from './routes/userRoutes.js';
 import toolRoutes from './routes/toolRoutes.js';
 import cors from 'cors';
 import multer from "multer";
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from the correct path
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 //this connects our project to cluster
 mongoose
@@ -34,19 +42,6 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT'],        // Allow specific methods (GET, POST, etc.)
     credentials: true,                // If you need to handle cookies or other credentials
   }));
-
-
-// Add tool route
-app.post("/api/tools/add", upload.single("image"), (req, res) => {
-    const { owner, flatNumber, productName, description, max, price } = req.body;
-    const image = req.file; // Uploaded file is here
-
-    // Log the tool data
-    console.log({ owner, flatNumber, productName, description, max, price, image });
-
-    // Save data to database (mocked response here)
-    res.status(200).json({ message: "Tool added successfully!" });
-});
 
 
 // Use the routes

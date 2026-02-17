@@ -11,7 +11,7 @@ class UserModel {
                 toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
                 toolsReviewed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools reviewed by the user
                 profilePicture:{ type: String,
-                    default:"htt ps://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
+                    default:"https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
                 },
             },
             { timestamps: true }

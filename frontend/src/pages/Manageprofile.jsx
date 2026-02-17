@@ -10,7 +10,7 @@ import { updateFailure, updateStart, updateSuccess } from '../redux/userSlice';
 
 export default function DashProfile() {
   const dispatch = useDispatch();
-  const {user,loading,error} = useSelector((state) => state.user.currentUser); 
+  const {currentUser: user, loading, error} = useSelector((state) => state.user); 
 
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(user?.profilePicture || ''); 

@@ -10,7 +10,7 @@ class ToolController {
                 return res.status(400).json({ message: 'Name, description, and owner are required.' });
             }
     
-            const tool = await ToolModel.create({
+            const tool = await ToolModel.createTool({
                 name,
                 description,
                 owner,

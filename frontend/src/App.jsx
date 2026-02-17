@@ -9,9 +9,9 @@ import Register from './pages/Register';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AboutUs from './pages/AboutUs';
-import BorrowedTools from './pages/borrowedTools';
-import RegisteredTools from './pages/registeredTools';
-import ReviewedTools from './pages/reviewedTools';
+import BorrowedTools from './pages/BorrowedTools';
+import RegisteredTools from './pages/RegisteredTools';
+import ReviewedTools from './pages/ReviewedTools';
 import Manageprofile from './pages/Manageprofile';
 import SearchResultsPage from './pages/SearchResults';
 
