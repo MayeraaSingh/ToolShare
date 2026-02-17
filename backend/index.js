@@ -9,6 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -34,8 +35,16 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // File size limit: 5 MB
 });
 
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+
 // Security middleware
 app.use(helmet());
+app.use(limiter);
 
 // Middleware for JSON and URL-encoded data
 app.use(express.json({ limit: "10mb" }));
