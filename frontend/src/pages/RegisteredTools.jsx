@@ -17,7 +17,9 @@ const RegisteredTools = () => {
         return;
       }
       try {
-        const response = await fetch(`/api/tools/owned/${currentUser.id}`);
+        const response = await fetch(`/api/tools/owned/${currentUser.id}`, {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch tools');
         }

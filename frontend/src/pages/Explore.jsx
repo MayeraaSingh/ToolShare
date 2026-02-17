@@ -13,7 +13,9 @@ const ExplorePage = () => {
     const fetchTools = async () => {
       try {
         // Fetch the tools from your backend using fetch
-        const response = await fetch('/api/tools/gettools'); // Replace with your actual API endpoint
+        const response = await fetch('/api/tools/gettools', {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch tools');
         }

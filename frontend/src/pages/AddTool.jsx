@@ -72,6 +72,7 @@ export default function AddTool(){
             const response = await fetch("/api/tools/add", {
                 method: "POST",
                 body: formData,
+                credentials: 'include'
             });
 
             const data = await response.json();

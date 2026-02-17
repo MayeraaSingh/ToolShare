@@ -17,7 +17,9 @@ export default function ReviewedTools() {
             }
             try {
                 // Fetch user data with populated toolsReviewed
-                const response = await fetch(`/api/users/${currentUser.email}`);
+                const response = await fetch(`/api/users/${currentUser.email}`, {
+                    credentials: 'include'
+                });
                 if (!response.ok) {
                     throw new Error('Failed to fetch reviewed tools');
                 }

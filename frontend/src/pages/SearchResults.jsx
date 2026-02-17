@@ -20,7 +20,9 @@ const SearchResultsPage = () => {
         return;
       }
       try {
-        const response = await fetch(`/api/tools/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`/api/tools/search?q=${encodeURIComponent(query)}`, {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to search tools');
         }

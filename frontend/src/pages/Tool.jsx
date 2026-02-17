@@ -11,7 +11,9 @@ function ProductDetails() {
   useEffect(() => {
     const fetchTool = async () => {
       try {
-        const response = await fetch(`/api/tools/${toolId}`);
+        const response = await fetch(`/api/tools/${toolId}`, {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch tool details');
         }
