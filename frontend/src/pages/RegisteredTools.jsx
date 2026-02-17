@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ToolCard from '../components/ToolCard';  // Import ToolCard component
 
@@ -21,7 +21,7 @@ const RegisteredTools = () => {
         }
         const data = await response.json();
         setTools(data);
-      } catch (err) {
+      } catch {
         alert('Error fetching tools. Please try again later.');
       } finally {
         setLoading(false);
@@ -41,11 +41,11 @@ const RegisteredTools = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {tools.map((tool) => (
           <ToolCard
-            key={tool.id}  // Ensure you have a unique id for each tool
-            title={tool.title}
+            key={tool._id}
+            title={tool.name}
             image={tool.image}  // Add your tool's image URL here
             description={tool.description}
-            flatNumber={tool.flatNumber}
+            flatNumber={tool.owner?.flatNumber}
             primaryButtonText="Action"  // Add appropriate button text
             primaryButtonAction={() => {/* Add action logic here */}}
             secondaryButtonText="More Info"
