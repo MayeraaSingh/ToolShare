@@ -8,6 +8,7 @@ import multer from "multer";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +33,9 @@ const upload = multer({
     dest: "uploads/", // Directory for uploaded files
     limits: { fileSize: 5 * 1024 * 1024 }, // File size limit: 5 MB
 });
+
+// Security middleware
+app.use(helmet());
 
 // Middleware for JSON and URL-encoded data
 app.use(express.json({ limit: "10mb" }));
