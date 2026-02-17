@@ -2,20 +2,21 @@ import express from 'express';
 const router = express.Router();
 import ToolController from '../controllers/ToolController.js';
 import ToolModel from '../models/Tool.js';
+import { verifyToken, optionalAuth } from '../middleware/auth.js';
 
-// Route to get all tools
+// Route to get all tools (public)
 router.get('/', ToolController.getAllTools);
 
-// Route to search tools
+// Route to search tools (public)
 router.get('/search', ToolController.searchTools);
 
-// Route to get borrowed tools by user
-router.get('/borrowed/:userId', ToolController.getBorrowedToolsByUser);
+// Route to get borrowed tools by user (protected)
+router.get('/borrowed/:userId', verifyToken, ToolController.getBorrowedToolsByUser);
 
-// Route to get owned tools by user
-router.get('/owned/:userId', ToolController.getToolsByOwner);
+// Route to get owned tools by user (protected)
+router.get('/owned/:userId', verifyToken, ToolController.getToolsByOwner);
 
-// Fetch all tools (legacy endpoint)
+// Fetch all tools (legacy endpoint - public)
 router.get('/gettools', async (req, res) => {
     try {
       const tools = await ToolModel.model.find(); // This fetches all tools from MongoDB
@@ -26,17 +27,17 @@ router.get('/gettools', async (req, res) => {
     }
   });
 
-// Route to add a new tool
-router.post('/add', ToolController.addTool);
+// Route to add a new tool (protected)
+router.post('/add', verifyToken, ToolController.addTool);
 
-// Route to get tool by ID
+// Route to get tool by ID (public)
 router.get('/:toolId', ToolController.getToolById);
 
-// Route to update tool details
-router.put('/:toolId', ToolController.updateTool);
+// Route to update tool details (protected)
+router.put('/:toolId', verifyToken, ToolController.updateTool);
 
-// Route to delete tool
-router.delete('/:toolId', ToolController.deleteTool);
+// Route to delete tool (protected)
+router.delete('/:toolId', verifyToken, ToolController.deleteTool);
   
 
 export default router;
