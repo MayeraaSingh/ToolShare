@@ -3,6 +3,13 @@ const router = express.Router();
 import ToolController from '../controllers/ToolController.js';
 import ToolModel from '../models/Tool.js';
 import { verifyToken, optionalAuth } from '../middleware/auth.js';
+import multer from 'multer';
+
+// Configure multer for image uploads
+const upload = multer({
+    dest: 'uploads/',
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
 
 // Route to get all tools (public)
 router.get('/', ToolController.getAllTools);
@@ -27,8 +34,8 @@ router.get('/gettools', async (req, res) => {
     }
   });
 
-// Route to add a new tool (protected)
-router.post('/add', verifyToken, ToolController.addTool);
+// Route to add a new tool (protected, with image upload)
+router.post('/add', verifyToken, upload.single('image'), ToolController.addTool);
 
 // Route to get tool by ID (public)
 router.get('/:toolId', ToolController.getToolById);

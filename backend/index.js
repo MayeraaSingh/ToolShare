@@ -54,10 +54,12 @@ app.use(cookieParser());
 // Enable CORS for all routes or specify allowed origins
 app.use(cors({
     origin: 'http://localhost:5173',  // Allow requests only from this frontend address
-    methods: ['GET', 'POST', 'PUT'],        // Allow specific methods (GET, POST, etc.)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],        // Allow specific methods
     credentials: true,                // If you need to handle cookies or other credentials
   }));
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Use the routes
 app.use('/api/users', userRoutes);

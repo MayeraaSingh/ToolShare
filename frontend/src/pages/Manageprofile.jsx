@@ -19,9 +19,9 @@ export default function DashProfile() {
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileError, setImageFileError] = useState(null);
   const [formData, setFormData] = useState({
-    name: user?.username || '',
+    name: user?.name || '',
     email: user?.email || '',
-    flat: user?.flat || '',
+    flatNumber: user?.flatNumber || '',
   }); 
   const filePickerRef = useRef();
 
@@ -97,10 +97,11 @@ export default function DashProfile() {
 
     try {
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${user._id}`, { 
+      const res = await fetch(`/api/users/${user._id}`, { 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+        credentials: 'include'
       });
 
       if (!res.ok) {
@@ -165,7 +166,7 @@ export default function DashProfile() {
           type="text"
           id="name"
           placeholder="name"
-          defaultValue={user?.username || ''}
+          defaultValue={user?.name || ''}
           onChange={handleChange}
         />
         <TextInput
@@ -177,9 +178,9 @@ export default function DashProfile() {
         />
         <TextInput
           type="text"
-          id="flat"
+          id="flatNumber"
           placeholder="flat number"
-          defaultValue={user?.flat || ''}
+          defaultValue={user?.flatNumber || ''}
           onChange={handleChange}
         />
         <Button

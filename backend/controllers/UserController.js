@@ -175,14 +175,18 @@ class UserController {
     async updateUser(req, res, next) {
         try {
             const { userId } = req.params;
-            const { name, email, flatNumber, profilePicture, toolsRegistered } = req.body;
+            const { name, email, flatNumber, profilePicture } = req.body;
+
+            // Authorization: Check if user is updating their own profile
+            if (userId !== req.userId) {
+                return next(errorHandler(403, 'Not authorized to update this profile'));
+            }
 
             const updatedUser = await UserModel.updateUser(userId, {
                 name,
                 email,
                 flatNumber,
                 profilePicture,
-                toolsRegistered,
             });
 
             if (!updatedUser) {
@@ -228,6 +232,12 @@ class UserController {
     async deleteUser(req, res, next) {
         try {
             const { userId } = req.params;
+            
+            // Authorization: Check if user is deleting their own account
+            if (userId !== req.userId) {
+                return next(errorHandler(403, 'Not authorized to delete this account'));
+            }
+            
             const deletedUser = await UserModel.deleteUser(userId);
             if (!deletedUser) {
                 return next(errorHandler(404, 'User not found'));

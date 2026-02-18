@@ -35,7 +35,7 @@ const userSlice = createSlice({
 
       if (userData) {
         const parsedData = JSON.parse(decodeURIComponent(userData));
-        state.currentUser = parsedData?.user || null; // Only take the `user` object
+        state.currentUser = parsedData || null; // Cookie already contains user object
       }
     },
     updateStart: (state) => {
@@ -43,7 +43,7 @@ const userSlice = createSlice({
       state.error = null;
     },
     updateSuccess: (state, action) => {
-      state.currentUser = action.payload?.user || null; // Ensure updated structure
+      state.currentUser = action.payload || null; // Accept user object directly
       state.loading = false;
       state.error = null;
     },

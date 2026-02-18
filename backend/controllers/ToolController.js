@@ -4,20 +4,23 @@ class ToolController {
     // Add a new tool
     async addTool(req, res, next) {
         try {
-            const { name, description, owner, availability, max, price, image } = req.body;
+            const { name, description, owner, availability, max, price } = req.body;
     
             if (!name || !description || !owner) {
                 return res.status(400).json({ message: 'Name, description, and owner are required.' });
             }
+
+            // Handle image upload - use uploaded file path or default
+            const imagePath = req.file ? `/uploads/${req.file.filename}` : "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     
             const tool = await ToolModel.createTool({
                 name,
                 description,
                 owner,
-                availability: availability !== undefined ? availability : true, // default to true if not provided
-                max: max || 1, // default to 1 if not provided
-                price: price || 0.00, // default to 0.00 if not provided
-                image: image || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", // default image if not provided
+                availability: availability !== undefined ? availability : true,
+                max: max || 1,
+                price: price || 0.00,
+                image: imagePath,
             });
     
             res.status(201).json({ message: 'Tool added successfully', tool });
@@ -45,10 +48,18 @@ class ToolController {
         try {
             const { toolId } = req.params;
             const updatedData = req.body;
-            const updatedTool = await ToolModel.updateTool(toolId, updatedData);
-            if (!updatedTool) {
+            
+            // Authorization: Check if user owns the tool
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) {
                 return res.status(404).json({ message: 'Tool not found' });
             }
+            
+            if (tool.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: 'Not authorized to update this tool' });
+            }
+            
+            const updatedTool = await ToolModel.updateTool(toolId, updatedData);
             res.status(200).json({ message: 'Tool updated successfully', updatedTool });
         } catch (error) {
             res.status(400).json({ message: 'Error updating tool', error: error.message });
@@ -109,10 +120,18 @@ class ToolController {
     async deleteTool(req, res) {
         try {
             const { toolId } = req.params;
-            const deletedTool = await ToolModel.deleteTool(toolId);
-            if (!deletedTool) {
+            
+            // Authorization: Check if user owns the tool
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) {
                 return res.status(404).json({ message: 'Tool not found' });
             }
+            
+            if (tool.owner.toString() !== req.userId) {
+                return res.status(403).json({ message: 'Not authorized to delete this tool' });
+            }
+            
+            const deletedTool = await ToolModel.deleteTool(toolId);
             res.status(200).json({ message: 'Tool deleted successfully', deletedTool });
         } catch (error) {
             res.status(500).json({ message: 'Error deleting tool', error: error.message });
