@@ -148,11 +148,18 @@ export default function Header() {
                                         <p className="text-sm font-semibold">Hello Guest</p>
                                         <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">Please log in to continue</p>
                                         <Link
-                                            to="/register"
+                                            to="/login"
                                             className="text-blue-500 hover:text-blue-600 block mt-2"
-                                            onClick={() => setIsUserMenuOpen(false)} // Close dropdown
+                                            onClick={() => setIsUserMenuOpen(false)}
                                         >
-                                            Login / Register
+                                            Log In
+                                        </Link>
+                                        <Link
+                                            to="/register"
+                                            className="text-blue-500 hover:text-blue-600 block mt-1"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                        >
+                                            Register
                                         </Link>
                                     </div>
                                 )}

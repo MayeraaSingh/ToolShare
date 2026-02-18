@@ -19,51 +19,53 @@ const dataCookieOptions = {
 };
 
 class UserController {
+    // LOGIN - existing users only
+    async login(req, res, next) {
+        try {
+            const { email } = req.body;
+            if (!email) return next(errorHandler(400, 'Email is required'));
+
+            const user = await UserModel.findByEmail(email);
+            if (!user) return next(errorHandler(404, 'No account found with that email. Please register first.'));
+
+            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+            return res
+                .status(200)
+                .cookie('access-token', token, authCookieOptions)
+                .cookie('user-data', JSON.stringify({
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    profilePicture: user.profilePicture,
+                    flatNumber: user.flatNumber,
+                }), dataCookieOptions)
+                .json({
+                    message: 'Logged in successfully',
+                    user: {
+                        _id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        profilePicture: user.profilePicture,
+                        flatNumber: user.flatNumber,
+                        toolsBorrowed: user.toolsBorrowed,
+                        toolsOwned: user.toolsOwned,
+                        toolsReviewed: user.toolsReviewed,
+                    },
+                });
+        } catch (error) {
+            return next(errorHandler(500, error.message || 'An unexpected error occurred'));
+        }
+    }
+
+    // REGISTER - new users only
     async register(req, res, next) {
         try {
             const { email } = req.body;
+            if (!email) return next(errorHandler(400, 'Email is required'));
 
-            if (!email) {
-                return next(errorHandler(400, 'Email is required'));
-            }
-
-            const user = await UserModel.findByEmail(email);
-
-            if (user) {
-                const token = jwt.sign(
-                    { id: user._id, email: user.email },
-                    process.env.JWT_SECRET,
-                    { expiresIn: '7d' }
-                );
-
-                return res
-                    .status(200)
-                    .cookie('access-token', token, authCookieOptions)
-                    .cookie(
-                        'user-data',
-                        JSON.stringify({
-                            _id: user._id,
-                            name: user.name,
-                            email: user.email,
-                            profilePicture: user.profilePicture,
-                            flatNumber: user.flatNumber,
-                        }),
-                        dataCookieOptions
-                    )
-                    .json({
-                        message: 'User logged in successfully',
-                        user: {
-                            _id: user._id,
-                            name: user.name,
-                            email: user.email,
-                            profilePicture: user.profilePicture,
-                            flatNumber: user.flatNumber,
-                            toolsBorrowed: user.toolsBorrowed,
-                            toolsOwned: user.toolsOwned,
-                            toolsReviewed: user.toolsReviewed,
-                        },
-                    });
-            }
+            const existingUser = await UserModel.findByEmail(email);
+            if (existingUser) return next(errorHandler(409, 'An account with this email already exists. Please log in.'));
 
             const newUser = await UserModel.createUser({
                 email,
@@ -74,28 +76,20 @@ class UserController {
                 toolsReviewed: [],
             });
 
-            const token = jwt.sign(
-                { id: newUser._id, email: newUser.email },
-                process.env.JWT_SECRET,
-                { expiresIn: '7d' }
-            );
+            const token = jwt.sign({ id: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
             res
                 .status(201)
                 .cookie('access-token', token, authCookieOptions)
-                .cookie(
-                    'user-data',
-                    JSON.stringify({
-                        _id: newUser._id,
-                        name: newUser.name,
-                        email: newUser.email,
-                        profilePicture: newUser.profilePicture,
-                        flatNumber: newUser.flatNumber,
-                    }),
-                    dataCookieOptions
-                )
+                .cookie('user-data', JSON.stringify({
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    profilePicture: newUser.profilePicture,
+                    flatNumber: newUser.flatNumber,
+                }), dataCookieOptions)
                 .json({
-                    message: 'User registered successfully',
+                    message: 'Registered successfully',
                     user: {
                         _id: newUser._id,
                         name: newUser.name,

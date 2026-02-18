@@ -11,6 +11,8 @@ router.get('/', UserController.getAllUsers);
 
 // Route to register a new user (public)
 router.post('/register', UserController.register);
+// Route to login an existing user (public)
+router.post('/login', UserController.login);
 router.post('/google', UserController.registerGoogle);
 
 // Route to get user by email (public)

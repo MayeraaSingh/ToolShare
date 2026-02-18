@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import AddTool from './pages/AddTool';
 import Explore from './pages/Explore';
 import Register from './pages/Register';
+import Login from './pages/Login';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AboutUs from './pages/AboutUs';
@@ -35,6 +36,7 @@ export default function App() {
         <Route path='/explore' element={<Explore />} />
         <Route path='/addtool' element={<AddTool />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/login' element={<Login />} />
         <Route path='/borrowed' element={<BorrowedTools />} />
         <Route path='/reviewed' element={<ReviewedTools />} />
         <Route path='/about' element={<AboutUs />} />
