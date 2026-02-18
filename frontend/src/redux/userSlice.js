@@ -15,8 +15,7 @@ const userSlice = createSlice({
       state.error = null;
     },
     registerSuccess: (state, action) => {
-      // Ensure the payload has the expected structure
-      state.currentUser = action.payload?.user || null;
+      state.currentUser = action.payload || null; // Accept user object directly
       state.loading = false;
       state.error = null;
     },
@@ -27,15 +26,25 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    logout: (state) => {
+      state.currentUser = null;
+      state.error = null;
+      state.loading = false;
+    },
     populateUserFromCookie: (state) => {
-      const userData = document.cookie
+      const cookieEntry = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("user-data="))
-        ?.split("=")[1];
+        .find((row) => row.startsWith("user-data="));
 
-      if (userData) {
-        const parsedData = JSON.parse(decodeURIComponent(userData));
-        state.currentUser = parsedData || null; // Cookie already contains user object
+      if (cookieEntry) {
+        // Use slice(1).join('=') to handle '=' characters inside the value
+        const rawValue = cookieEntry.split("=").slice(1).join("=");
+        try {
+          const parsedData = JSON.parse(decodeURIComponent(rawValue));
+          state.currentUser = parsedData || null;
+        } catch {
+          state.currentUser = null;
+        }
       }
     },
     updateStart: (state) => {
@@ -63,6 +72,7 @@ export const {
   updateFailure,
   registerFailure,
   clearError,
+  logout,
   populateUserFromCookie,
 } = userSlice.actions;
 

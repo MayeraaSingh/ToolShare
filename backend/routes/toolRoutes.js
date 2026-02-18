@@ -34,6 +34,9 @@ router.get('/gettools', async (req, res) => {
     }
   });
 
+// Route to rent a tool (protected)
+router.post('/rent/:toolId', verifyToken, ToolController.rentTool);
+
 // Route to add a new tool (protected, with image upload)
 router.post('/add', verifyToken, upload.single('image'), ToolController.addTool);
 

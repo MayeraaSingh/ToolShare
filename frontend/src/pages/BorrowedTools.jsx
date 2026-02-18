@@ -17,7 +17,7 @@ const BorrowedTools = () => {
         return;
       }
       try {
-        const response = await fetch(`/api/tools/borrowed/${currentUser.id}`, {
+        const response = await fetch(`/api/tools/borrowed/${currentUser._id}`, {
           credentials: 'include'
         });
         if (!response.ok) {

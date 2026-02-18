@@ -51,7 +51,7 @@ export default function AddTool(){
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!currentUser || !currentUser.id) {
+        if (!currentUser || !currentUser._id) {
             toast.error("User not authenticated. Please log in.");
             return;
         }
@@ -59,7 +59,7 @@ export default function AddTool(){
         const formData = new FormData();
         formData.append('name', toolData.name);
         formData.append('description', toolData.description);
-        formData.append('owner', currentUser.id);
+        formData.append('owner', currentUser._id);
         formData.append('max', toolData.max);
         formData.append('price', toolData.price);
         if (toolData.image) {

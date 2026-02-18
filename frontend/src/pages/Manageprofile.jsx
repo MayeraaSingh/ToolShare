@@ -110,7 +110,7 @@ export default function DashProfile() {
         toast.error(data.message || 'Failed to update profile');
       } else {
         const data = await res.json();
-        dispatch(updateSuccess(data));
+        dispatch(updateSuccess(data.user));
         toast.success('Profile updated successfully!');
       }
     } catch (error) {

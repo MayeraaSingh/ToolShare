@@ -3,6 +3,9 @@ const router = express.Router();
 import UserController from '../controllers/UserController.js';
 import { verifyToken } from '../middleware/auth.js';
 
+// Route to logout (clears cookies)
+router.post('/logout', UserController.logout);
+
 // Route to get all users (public for now, should be admin only)
 router.get('/', UserController.getAllUsers);
 

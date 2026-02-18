@@ -116,6 +116,39 @@ class ToolController {
         }
     }
 
+    // Rent a tool (mark as unavailable, add to user's borrowedTools)
+    async rentTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const userId = req.userId;
+
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) {
+                return res.status(404).json({ message: 'Tool not found' });
+            }
+            if (!tool.availability) {
+                return res.status(400).json({ message: 'Tool is not available for rent' });
+            }
+            if (tool.owner._id.toString() === userId) {
+                return res.status(400).json({ message: 'You cannot rent your own tool' });
+            }
+
+            const UserModel = (await import('../models/User.js')).default;
+
+            // Mark tool as unavailable
+            await ToolModel.updateTool(toolId, { availability: false });
+
+            // Add to user's borrowed list
+            await UserModel.model.findByIdAndUpdate(userId, {
+                $addToSet: { toolsBorrowed: toolId }
+            });
+
+            res.status(200).json({ message: 'Tool rented successfully' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error renting tool', error: error.message });
+        }
+    }
+
     // Delete tool
     async deleteTool(req, res) {
         try {

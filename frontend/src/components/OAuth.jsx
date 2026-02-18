@@ -29,7 +29,7 @@ export default function OAuth() {
                 })
             const data = await res.json()
             if (res.ok){
-                dispatch(registerSuccess(data));
+                dispatch(registerSuccess(data.user));
                 navigate('/');
             }
         } catch (error) {

@@ -2,10 +2,19 @@ import { errorHandler } from '../middleware/error.js';
 import UserModel from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-const cookieOptions = {
+// HttpOnly for the auth token (not readable by JS - security)
+const authCookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+};
+
+// NOT httpOnly for user-data so JS can read it for state hydration on page refresh
+const dataCookieOptions = {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
@@ -29,20 +38,22 @@ class UserController {
 
                 return res
                     .status(200)
-                    .cookie('access-token', token, cookieOptions)
+                    .cookie('access-token', token, authCookieOptions)
                     .cookie(
                         'user-data',
                         JSON.stringify({
+                            _id: user._id,
                             name: user.name,
                             email: user.email,
                             profilePicture: user.profilePicture,
+                            flatNumber: user.flatNumber,
                         }),
-                        cookieOptions
+                        dataCookieOptions
                     )
                     .json({
                         message: 'User logged in successfully',
                         user: {
-                            id: user._id,
+                            _id: user._id,
                             name: user.name,
                             email: user.email,
                             profilePicture: user.profilePicture,
@@ -71,20 +82,22 @@ class UserController {
 
             res
                 .status(201)
-                .cookie('access-token', token, cookieOptions)
+                .cookie('access-token', token, authCookieOptions)
                 .cookie(
                     'user-data',
                     JSON.stringify({
+                        _id: newUser._id,
                         name: newUser.name,
                         email: newUser.email,
                         profilePicture: newUser.profilePicture,
+                        flatNumber: newUser.flatNumber,
                     }),
-                    cookieOptions
+                    dataCookieOptions
                 )
                 .json({
                     message: 'User registered successfully',
                     user: {
-                        id: newUser._id,
+                        _id: newUser._id,
                         name: newUser.name,
                         email: newUser.email,
                         profilePicture: newUser.profilePicture,
@@ -129,20 +142,22 @@ class UserController {
 
             res
                 .status(200)
-                .cookie('access-token', token, cookieOptions)
+                .cookie('access-token', token, authCookieOptions)
                 .cookie(
                     'user-data',
                     JSON.stringify({
+                        _id: user._id,
                         name: user.name,
                         email: user.email,
                         profilePicture: user.profilePicture,
+                        flatNumber: user.flatNumber,
                     }),
-                    cookieOptions
+                    dataCookieOptions
                 )
                 .json({
                     message: 'User authenticated successfully',
                     user: {
-                        id: user._id,
+                        _id: user._id,
                         name: user.name,
                         email: user.email,
                         profilePicture: user.profilePicture,
@@ -201,15 +216,17 @@ class UserController {
 
             res
                 .status(200)
-                .cookie('access-token', token, cookieOptions)
+                .cookie('access-token', token, authCookieOptions)
                 .cookie(
                     'user-data',
                     JSON.stringify({
+                        _id: updatedUser._id,
                         name: updatedUser.name,
                         email: updatedUser.email,
                         profilePicture: updatedUser.profilePicture,
+                        flatNumber: updatedUser.flatNumber,
                     }),
-                    cookieOptions
+                    dataCookieOptions
                 )
                 .json({
                     message: 'User updated successfully',
@@ -247,6 +264,11 @@ class UserController {
             return next(errorHandler(500, error.message || 'Error deleting user'));
         }
     }
+
+    async logout(req, res) {
+        res.clearCookie('access-token').clearCookie('user-data').status(200).json({ message: 'Logged out successfully' });
+    }
 }
 
 export default new UserController();
+

@@ -6,7 +6,9 @@ import { Button, TextInput } from 'flowbite-react';
 import { HiOutlineMenu } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleTheme } from '../redux/themeSlice.js';
+import { logout } from '../redux/userSlice.js';
 import DSidebar from './Sidebar.jsx';
+import toast from 'react-hot-toast';
 
 export default function Header() {
     const dispatch = useDispatch();
@@ -24,6 +26,17 @@ export default function Header() {
     
     const handleProfile = () => {
         setIsUserMenuOpen((prev) => !prev);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/users/logout', { method: 'POST', credentials: 'include' });
+        } catch {/* ignore */} finally {
+            dispatch(logout());
+            setIsUserMenuOpen(false);
+            navigate('/register');
+            toast.success('Logged out successfully');
+        }
     };
 
     const handleSearch = (e) => {
@@ -119,10 +132,16 @@ export default function Header() {
                                         <Link
                                             to="/manage-profile"
                                             className="text-blue-500 hover:text-blue-600 block mt-2"
-                                            onClick={() => setIsUserMenuOpen(false)} // Close dropdown
+                                            onClick={() => setIsUserMenuOpen(false)}
                                         >
                                             Manage Your Profile
                                         </Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="text-red-500 hover:text-red-600 block mt-2 text-sm text-left"
+                                        >
+                                            Logout
+                                        </button>
                                     </div>
                                 ) : (
                                     <div>

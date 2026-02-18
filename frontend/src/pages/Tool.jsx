@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Button, Spinner } from 'flowbite-react';
 import toast from 'react-hot-toast';
 
@@ -7,6 +8,8 @@ function ProductDetails() {
   const { toolId } = useParams();
   const [tool, setTool] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [renting, setRenting] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchTool = async () => {
@@ -32,12 +35,33 @@ function ProductDetails() {
     }
   }, [toolId]);
 
-  const handleRentNow = () => {
-    toast.success('Rent functionality coming soon!');
+  const handleRentNow = async () => {
+    if (!currentUser) {
+      toast.error('Please log in to rent a tool');
+      return;
+    }
+    try {
+      setRenting(true);
+      const res = await fetch(`/api/tools/rent/${toolId}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Tool rented successfully!');
+        setTool((prev) => ({ ...prev, availability: false }));
+      } else {
+        toast.error(data.message || 'Failed to rent tool');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setRenting(false);
+    }
   };
 
   const handleReviewLater = () => {
-    toast.success('Review for later functionality coming soon!');
+    toast.success('Saved for later! (feature coming soon)');
   };
 
   if (loading) {
@@ -104,9 +128,9 @@ function ProductDetails() {
             <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Details</h3>
             <ul className="space-y-2 text-gray-700 dark:text-gray-300">
               <li><strong>Description:</strong> {tool.description || 'No description available'}</li>
-              <li><strong>Owner Name:</strong> {tool.owner?.username || 'Unknown'}</li>
+              <li><strong>Owner Name:</strong> {tool.owner?.name || 'Unknown'}</li>
               <li><strong>Maximum Quantity:</strong> {tool.max || 1}</li>
-              <li><strong>Available:</strong> {tool.currentlyAvailable ? 'Yes' : 'No'}</li>
+              <li><strong>Available:</strong> {tool.availability ? 'Yes' : 'No'}</li>
             </ul>
           </div>
 
@@ -115,9 +139,10 @@ function ProductDetails() {
             <Button 
               className="flex-1" 
               onClick={handleRentNow}
-              disabled={!tool.currentlyAvailable}
+              disabled={!tool.availability || renting}
+              isProcessing={renting}
             >
-              {tool.currentlyAvailable ? 'Rent Now' : 'Not Available'}
+              {tool.availability ? (renting ? 'Renting...' : 'Rent Now') : 'Not Available'}
             </Button>
             <Button 
               className="flex-1" 
