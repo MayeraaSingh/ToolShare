@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 export default function OAuth() {
+    console.log('[OAuth] Rendering OAuth component');
     const auth = getAuth(app)
     const dispatch = useDispatch()
     const navigate = useNavigate()

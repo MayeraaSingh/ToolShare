@@ -3,6 +3,7 @@ import { Button, Card } from 'flowbite-react';
 import {Link} from 'react-router-dom';
 
 const HomePage = () => {
+  console.log('[Home] Rendering HomePage');
   const [faqs, setFaqs] = useState([
     { question: "Is there a limit to how many tools I can borrow or lend?", 
       answer: "Nope! You can borrow or lend as many tools as you'd like, as long as they’re available and meet the terms set by the owner. It’s all about sharing responsibly within your community"

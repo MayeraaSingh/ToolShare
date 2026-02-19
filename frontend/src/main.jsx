@@ -7,6 +7,8 @@ import {store,persistor} from "./redux/store.js"; // Import store and persistor
 import App from "./App"; // Main App component
 import ThemeProvider from "./components/ThemeProvider.jsx";
 
+console.log('[main] Starting React – root element:', document.getElementById('root'));
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode> 
     <Provider store={store}>

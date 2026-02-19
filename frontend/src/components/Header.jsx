@@ -19,6 +19,7 @@ export default function Header() {
 
     // Get current user from Redux
     const user = useSelector((state) => state.user.currentUser);
+    console.log('[Header] Rendering, currentUser:', user);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);

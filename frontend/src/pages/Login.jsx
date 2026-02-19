@@ -8,6 +8,7 @@ import OAuth from "../components/OAuth";
 import loginImage from './login.jpg';
 
 export default function Login() {
+  console.log('[Login] Rendering Login page');
   const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,10 +16,12 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log('[Login] handleLogin called with email:', email);
     dispatch(registerStart());
     setLoading(true);
 
     try {
+      console.log('[Login] Sending POST /api/users/login');
       const response = await fetch("/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -27,6 +30,7 @@ export default function Login() {
       });
 
       const data = await response.json();
+      console.log('[Login] Response status:', response.status, 'data:', data);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
@@ -36,6 +40,7 @@ export default function Login() {
       toast.success('Logged in successfully!');
       navigate("/");
     } catch (error) {
+      console.error('[Login] Error during login:', error.message);
       dispatch(registerFailure(error.message));
       toast.error(error.message || 'Login failed');
     } finally {
@@ -89,7 +94,7 @@ export default function Login() {
 
             {/* Link to Register */}
             <p className="mt-4 text-sm text-center w-full text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link to="/register" className="text-blue-500 hover:underline font-semibold">
                 Register here
               </Link>
