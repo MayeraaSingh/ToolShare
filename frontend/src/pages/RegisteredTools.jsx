@@ -134,6 +134,10 @@ const RegisteredTools = () => {
                   </div>
                 ))}
               </div>
+            ) : (!tool.availability || tool.rentedCount > 0) ? (
+              <div className="mt-1 rounded-b-lg border border-t-0 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700 px-3 py-2 text-sm text-yellow-700 dark:text-yellow-400">
+                Rented out
+              </div>
             ) : (
               <div className="mt-1 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                 Available

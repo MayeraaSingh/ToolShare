@@ -55,9 +55,26 @@ class ToolModel {
         return await this.model.find(filter).populate('owner');
     }
 
-    // Get tools by owner (user ID)
+    // Get tools by owner (user ID) — also backfills rentedBy from user.toolsBorrowed for legacy records
     async getToolsByOwner(userId) {
-        return await this.model.find({ owner: userId }).populate('owner').populate('rentedBy', 'name email flatNumber phone');
+        const tools = await this.model.find({ owner: userId }).populate('owner').populate('rentedBy', 'name email flatNumber phone');
+
+        // Backfill rentedBy for tools rented before this field existed
+        const UserModel = (await import('./User.js')).default;
+        for (const tool of tools) {
+            if (tool.rentedBy.length === 0 && (!tool.availability || tool.rentedCount > 0)) {
+                const borrowers = await UserModel.model
+                    .find({ toolsBorrowed: tool._id })
+                    .select('name email flatNumber phone');
+                if (borrowers.length > 0) {
+                    const ids = borrowers.map(b => b._id);
+                    await this.model.findByIdAndUpdate(tool._id, { $addToSet: { rentedBy: { $each: ids } } });
+                    tool.rentedBy = borrowers;
+                }
+            }
+        }
+
+        return tools;
     }
 
     // Delete tool
