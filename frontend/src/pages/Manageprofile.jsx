@@ -26,6 +26,13 @@ export default function DashProfile() {
   }); 
   const filePickerRef = useRef();
 
+  // Sync preview URL when Redux user loads (cookie hydration) or changes
+  useEffect(() => {
+    if (user?.profilePicture && !imageFile) {
+      setImageFileUrl(user.profilePicture);
+    }
+  }, [user?.profilePicture]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -55,8 +62,11 @@ export default function DashProfile() {
         setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
-        setImageFileError('Could not upload image');
-        toast.error('Could not upload image');
+        const msg = error?.code
+          ? `Upload failed: ${error.code}`
+          : 'Could not upload image (check Firebase Storage rules)';
+        setImageFileError(msg);
+        toast.error(msg);
         setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(user?.profilePicture || '');
@@ -82,16 +92,11 @@ export default function DashProfile() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (Object.keys(formData).length === 0) {
-      toast.error('No changes made');
-      return;
-    }
 
     if (imageFileUploading) {
       toast.error('Image is uploading, please wait');
