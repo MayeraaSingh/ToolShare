@@ -10,8 +10,12 @@ class ToolModel {
             max: { type: Number, default: 1 },
             rentedCount: { type: Number, default: 0 }, // How many are currently rented out
             rentedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Who currently has this tool
+            borrows: [{
+                user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+                borrowedAt: { type: Date, default: Date.now },
+                dueDate: { type: Date, required: true },
+            }],
             price: { type: Number, default: 0.00 },
-            renewedAt: { type: Date, default: null },
             image: { 
                 type: String, 
                 default: "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg"

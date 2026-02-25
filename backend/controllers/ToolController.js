@@ -118,7 +118,19 @@ class ToolController {
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            res.status(200).json(user.toolsBorrowed);
+            // Attach per-user dueDate to each tool
+            const toolsWithBorrowInfo = user.toolsBorrowed.map(tool => {
+                const toolObj = tool.toObject();
+                const borrowEntry = tool.borrows?.find(
+                    b => b.user.toString() === userId
+                );
+                return {
+                    ...toolObj,
+                    dueDate: borrowEntry?.dueDate || null,
+                    borrowedAt: borrowEntry?.borrowedAt || null,
+                };
+            });
+            res.status(200).json(toolsWithBorrowInfo);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching borrowed tools', error: error.message });
         }
@@ -152,6 +164,13 @@ class ToolController {
             });
             await ToolModel.model.findByIdAndUpdate(toolId, { $addToSet: { rentedBy: userId } });
 
+            // Record per-user borrow entry with 7-day due date
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 7);
+            await ToolModel.model.findByIdAndUpdate(toolId, {
+                $push: { borrows: { user: userId, borrowedAt: new Date(), dueDate } }
+            });
+
             // Add to user's borrowed list
             await UserModel.model.findByIdAndUpdate(userId, {
                 $addToSet: { toolsBorrowed: toolId }
@@ -182,6 +201,9 @@ class ToolController {
             });
             await ToolModel.model.findByIdAndUpdate(toolId, { $pull: { rentedBy: userId } });
 
+            // Remove borrow entry for this user
+            await ToolModel.model.findByIdAndUpdate(toolId, { $pull: { borrows: { user: userId } } });
+
             // Remove from user's borrowed list
             await UserModel.model.findByIdAndUpdate(userId, {
                 $pull: { toolsBorrowed: toolId }
@@ -193,26 +215,36 @@ class ToolController {
         }
     }
 
-    // Renew a borrowed tool (extends the borrow period)
+    // Renew a borrowed tool (extends dueDate by 7 days from the current expiry)
     async renewTool(req, res) {
         try {
             const { toolId } = req.params;
             const userId = req.userId;
+            const RENEW_DAYS = 7;
 
-            const tool = await ToolModel.findById(toolId);
+            const tool = await ToolModel.model.findById(toolId);
             if (!tool) return res.status(404).json({ message: 'Tool not found' });
 
-            const isRentedByUser = tool.rentedBy.some(
-                (u) => u._id ? u._id.toString() === userId : u.toString() === userId
+            const borrowEntry = tool.borrows?.find(
+                b => b.user.toString() === userId
             );
-            if (!isRentedByUser) {
+            if (!borrowEntry) {
                 return res.status(400).json({ message: 'You have not borrowed this tool' });
             }
 
-            // Update renewedAt timestamp on the tool document
-            await ToolModel.model.findByIdAndUpdate(toolId, { renewedAt: new Date() });
+            // Extend from current dueDate (not from today), so partial days aren't lost
+            const baseDueDate = borrowEntry.dueDate
+                ? new Date(borrowEntry.dueDate)
+                : new Date();
+            const newDueDate = new Date(baseDueDate);
+            newDueDate.setDate(newDueDate.getDate() + RENEW_DAYS);
 
-            res.status(200).json({ message: 'Tool renewed successfully' });
+            await ToolModel.model.findOneAndUpdate(
+                { _id: toolId, 'borrows.user': userId },
+                { $set: { 'borrows.$.dueDate': newDueDate } }
+            );
+
+            res.status(200).json({ message: 'Tool renewed successfully', newDueDate });
         } catch (error) {
             res.status(500).json({ message: 'Error renewing tool', error: error.message });
         }
