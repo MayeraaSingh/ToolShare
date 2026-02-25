@@ -19,14 +19,19 @@ const dataCookieOptions = {
 };
 
 class UserController {
-    // LOGIN - existing users only
+    // LOGIN - email + password
     async login(req, res, next) {
         try {
-            const { email } = req.body;
-            if (!email) return next(errorHandler(400, 'Email is required'));
+            const { email, password } = req.body;
+            if (!email || !password) return next(errorHandler(400, 'Email and password are required'));
 
             const user = await UserModel.findByEmail(email);
             if (!user) return next(errorHandler(404, 'No account found with that email. Please register first.'));
+
+            if (!user.password) return next(errorHandler(400, 'This account uses Google sign-in. Please continue with Google.'));
+
+            const valid = await UserModel.comparePassword(password, user.password);
+            if (!valid) return next(errorHandler(401, 'Incorrect password'));
 
             const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -39,6 +44,7 @@ class UserController {
                     email: user.email,
                     profilePicture: user.profilePicture,
                     flatNumber: user.flatNumber,
+                    phone: user.phone,
                 }), dataCookieOptions)
                 .json({
                     message: 'Logged in successfully',
@@ -48,6 +54,7 @@ class UserController {
                         email: user.email,
                         profilePicture: user.profilePicture,
                         flatNumber: user.flatNumber,
+                        phone: user.phone,
                         toolsBorrowed: user.toolsBorrowed,
                         toolsOwned: user.toolsOwned,
                         toolsReviewed: user.toolsReviewed,
@@ -58,18 +65,23 @@ class UserController {
         }
     }
 
-    // REGISTER - new users only
+    // REGISTER - name + email + password
     async register(req, res, next) {
         try {
-            const { email } = req.body;
-            if (!email) return next(errorHandler(400, 'Email is required'));
+            const { name, email, password } = req.body;
+            if (!name || !email || !password) return next(errorHandler(400, 'Name, email and password are required'));
 
             const existingUser = await UserModel.findByEmail(email);
             if (existingUser) return next(errorHandler(409, 'An account with this email already exists. Please log in.'));
 
+            const hashedPassword = await UserModel.hashPassword(password);
+
             const newUser = await UserModel.createUser({
+                name,
                 email,
+                password: hashedPassword,
                 profilePicture: '',
+                phone: '',
                 flatNumber: '',
                 toolsBorrowed: [],
                 toolsOwned: [],
@@ -87,6 +99,7 @@ class UserController {
                     email: newUser.email,
                     profilePicture: newUser.profilePicture,
                     flatNumber: newUser.flatNumber,
+                    phone: newUser.phone,
                 }), dataCookieOptions)
                 .json({
                     message: 'Registered successfully',
@@ -96,6 +109,7 @@ class UserController {
                         email: newUser.email,
                         profilePicture: newUser.profilePicture,
                         flatNumber: newUser.flatNumber,
+                        phone: newUser.phone,
                         toolsBorrowed: newUser.toolsBorrowed,
                         toolsOwned: newUser.toolsOwned,
                         toolsReviewed: newUser.toolsReviewed,
@@ -145,6 +159,7 @@ class UserController {
                         email: user.email,
                         profilePicture: user.profilePicture,
                         flatNumber: user.flatNumber,
+                        phone: user.phone,
                     }),
                     dataCookieOptions
                 )
@@ -156,6 +171,7 @@ class UserController {
                         email: user.email,
                         profilePicture: user.profilePicture,
                         flatNumber: user.flatNumber,
+                        phone: user.phone,
                         toolsBorrowed: user.toolsBorrowed,
                         toolsOwned: user.toolsOwned,
                         toolsReviewed: user.toolsReviewed,
@@ -184,7 +200,7 @@ class UserController {
     async updateUser(req, res, next) {
         try {
             const { userId } = req.params;
-            const { name, email, flatNumber, profilePicture } = req.body;
+            const { name, email, flatNumber, profilePicture, phone } = req.body;
 
             // Authorization: Check if user is updating their own profile
             if (userId !== req.userId) {
@@ -196,6 +212,7 @@ class UserController {
                 email,
                 flatNumber,
                 profilePicture,
+                phone,
             });
 
             if (!updatedUser) {
@@ -219,6 +236,7 @@ class UserController {
                         email: updatedUser.email,
                         profilePicture: updatedUser.profilePicture,
                         flatNumber: updatedUser.flatNumber,
+                        phone: updatedUser.phone,
                     }),
                     dataCookieOptions
                 )

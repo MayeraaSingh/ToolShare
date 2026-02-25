@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 class UserModel {
     constructor() {
@@ -6,10 +7,12 @@ class UserModel {
             {
                 name: { type: String },
                 email: { type: String, unique: true },
-                flatNumber: { type: String}, // New field for flat number
-                toolsBorrowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools borrowed by the user
-                toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools owned by the user
-                toolsReviewed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }], // Tools reviewed by the user
+                password: { type: String }, // hashed
+                phone: { type: String, default: '' },
+                flatNumber: { type: String },
+                toolsBorrowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }],
+                toolsOwned: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }],
+                toolsReviewed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tool' }],
                 profilePicture:{ type: String,
                     default:"https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg", 
                 },
@@ -18,6 +21,16 @@ class UserModel {
         );
 
         this.model = mongoose.model('User', userSchema);
+    }
+
+    // Hash a password
+    async hashPassword(plainText) {
+        return await bcrypt.hash(plainText, 10);
+    }
+
+    // Compare a plain password against a hash
+    async comparePassword(plainText, hash) {
+        return await bcrypt.compare(plainText, hash);
     }
 
     // Create a new user

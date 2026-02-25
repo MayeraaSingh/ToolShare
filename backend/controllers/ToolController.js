@@ -143,11 +143,11 @@ class ToolController {
             const newRentedCount = (tool.rentedCount || 0) + 1;
             const nowFull = newRentedCount >= tool.max;
 
-            // Update rentedCount and flip availability only when fully rented out
             await ToolModel.updateTool(toolId, {
                 rentedCount: newRentedCount,
                 availability: !nowFull,
             });
+            await ToolModel.model.findByIdAndUpdate(toolId, { $addToSet: { rentedBy: userId } });
 
             // Add to user's borrowed list
             await UserModel.model.findByIdAndUpdate(userId, {
@@ -173,11 +173,11 @@ class ToolController {
 
             const newRentedCount = Math.max(0, (tool.rentedCount || 0) - 1);
 
-            // Mark tool available when stock frees up
             await ToolModel.updateTool(toolId, {
                 rentedCount: newRentedCount,
                 availability: true,
             });
+            await ToolModel.model.findByIdAndUpdate(toolId, { $pull: { rentedBy: userId } });
 
             // Remove from user's borrowed list
             await UserModel.model.findByIdAndUpdate(userId, {

@@ -9,6 +9,7 @@ class ToolModel {
             availability: { type: Boolean, default: true }, // True = Available, False = Borrowed
             max: { type: Number, default: 1 },
             rentedCount: { type: Number, default: 0 }, // How many are currently rented out
+            rentedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Who currently has this tool
             price: { type: Number, default: 0.00 },
             image: { 
                 type: String, 
@@ -28,7 +29,7 @@ class ToolModel {
 
     // Find tool by ID
     async findById(toolId) {
-        return await this.model.findById(toolId).populate('owner');
+        return await this.model.findById(toolId).populate('owner').populate('rentedBy', 'name email flatNumber phone');
     }
 
     // Update tool details
@@ -56,7 +57,7 @@ class ToolModel {
 
     // Get tools by owner (user ID)
     async getToolsByOwner(userId) {
-        return await this.model.find({ owner: userId }).populate('owner');
+        return await this.model.find({ owner: userId }).populate('owner').populate('rentedBy', 'name email flatNumber phone');
     }
 
     // Delete tool

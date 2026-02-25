@@ -22,6 +22,7 @@ export default function DashProfile() {
     name: user?.name || '',
     email: user?.email || '',
     flatNumber: user?.flatNumber || '',
+    phone: user?.phone || '',
   }); 
   const filePickerRef = useRef();
 
@@ -181,6 +182,13 @@ export default function DashProfile() {
           id="flatNumber"
           placeholder="flat number"
           defaultValue={user?.flatNumber || ''}
+          onChange={handleChange}
+        />
+        <TextInput
+          type="tel"
+          id="phone"
+          placeholder="phone number"
+          defaultValue={user?.phone || ''}
           onChange={handleChange}
         />
         <Button

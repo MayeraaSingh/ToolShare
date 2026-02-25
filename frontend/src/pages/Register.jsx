@@ -8,7 +8,9 @@ import OAuth from "../components/OAuth";
 import loginImage from './login.jpg';
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,7 @@ export default function Register() {
       const response = await fetch("/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ name, email, password }),
         credentials: 'include',
       });
 
@@ -53,7 +55,15 @@ export default function Register() {
             <p className="text-gray-500 dark:text-gray-400 mb-8 text-center w-full">Create a new account to start sharing tools.</p>
 
             <form onSubmit={handleRegister} className="w-full space-y-4">
-              {/* Email Input */}
+              <TextInput
+                id="name"
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="text-lg"
+              />
               <TextInput
                 id="email"
                 type="email"
@@ -63,8 +73,15 @@ export default function Register() {
                 required
                 className="text-lg"
               />
-
-              {/* Register Button */}
+              <TextInput
+                id="password"
+                type="password"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="text-lg"
+              />
               <Button
                 type="submit"
                 size="lg"

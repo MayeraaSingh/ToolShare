@@ -8,29 +8,26 @@ import OAuth from "../components/OAuth";
 import loginImage from './login.jpg';
 
 export default function Login() {
-  console.log('[Login] Rendering Login page');
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('[Login] handleLogin called with email:', email);
     dispatch(registerStart());
     setLoading(true);
 
     try {
-      console.log('[Login] Sending POST /api/users/login');
       const response = await fetch("/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password }),
         credentials: 'include',
       });
 
       const data = await response.json();
-      console.log('[Login] Response status:', response.status, 'data:', data);
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
@@ -40,7 +37,6 @@ export default function Login() {
       toast.success('Logged in successfully!');
       navigate("/");
     } catch (error) {
-      console.error('[Login] Error during login:', error.message);
       dispatch(registerFailure(error.message));
       toast.error(error.message || 'Login failed');
     } finally {
@@ -58,7 +54,6 @@ export default function Login() {
             <p className="text-gray-500 dark:text-gray-400 mb-8 text-center w-full">Welcome back! Log in to continue.</p>
 
             <form onSubmit={handleLogin} className="w-full space-y-4">
-              {/* Email Input */}
               <TextInput
                 id="email"
                 type="email"
@@ -68,8 +63,15 @@ export default function Login() {
                 required
                 className="text-lg"
               />
-
-              {/* Login Button */}
+              <TextInput
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="text-lg"
+              />
               <Button
                 type="submit"
                 size="lg"

@@ -109,17 +109,37 @@ const RegisteredTools = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {tools.map((tool) => (
-          <ToolCard
-            key={tool._id}
-            title={tool.name}
-            image={tool.image}
-            description={tool.description}
-            flatNumber={tool.owner?.flatNumber}
-            primaryButtonText="Edit"
-            primaryButtonAction={() => openEdit(tool)}
-            secondaryButtonText="Delete"
-            secondaryButtonAction={() => setDeletingTool(tool)}
-          />
+          <div key={tool._id} className="flex flex-col">
+            <ToolCard
+              title={tool.name}
+              image={tool.image}
+              description={tool.description}
+              flatNumber={tool.owner?.flatNumber}
+              primaryButtonText="Edit"
+              primaryButtonAction={() => openEdit(tool)}
+              secondaryButtonText="Delete"
+              secondaryButtonAction={() => setDeletingTool(tool)}
+            />
+            {/* Borrower info */}
+            {tool.rentedBy && tool.rentedBy.length > 0 ? (
+              <div className="mt-1 rounded-b-lg border border-t-0 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-700 px-3 py-2 text-sm">
+                <p className="font-semibold text-green-700 dark:text-green-400 mb-1">
+                  Currently rented by:
+                </p>
+                {tool.rentedBy.map((borrower) => (
+                  <div key={borrower._id} className="mb-1 text-gray-700 dark:text-gray-300">
+                    <span className="font-medium">{borrower.name}</span>
+                    {borrower.flatNumber && <span> · Flat {borrower.flatNumber}</span>}
+                    {borrower.phone && <span> · {borrower.phone}</span>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-1 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                Available
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
