@@ -10,7 +10,6 @@ const BorrowedTools = () => {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Fetch the tools borrowed by the current user
     const fetchTools = async () => {
       if (!currentUser) {
         setLoading(false);
@@ -24,7 +23,7 @@ const BorrowedTools = () => {
           throw new Error('Failed to fetch borrowed tools');
         }
         const data = await response.json();
-        setTools(data);  // Assuming your API returns an array
+        setTools(data);
       } catch (err) {
         toast.error('Error fetching borrowed tools. Please try again later.');
         console.error(err);
@@ -35,6 +34,24 @@ const BorrowedTools = () => {
 
     fetchTools();
   }, [currentUser]);
+
+  const handleReturn = async (tool) => {
+    try {
+      const res = await fetch(`/api/tools/return/${tool._id}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTools((prev) => prev.filter((t) => t._id !== tool._id));
+        toast.success(`${tool.name} returned successfully!`);
+      } else {
+        toast.error(data.message || 'Failed to return tool');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    }
+  };
 
   if (loading) {
     return (
@@ -70,7 +87,7 @@ const BorrowedTools = () => {
             primaryButtonText="Renew"
             primaryButtonAction={() => toast.success('Renew functionality coming soon!')}
             secondaryButtonText="Return"
-            secondaryButtonAction={() => toast.success('Return functionality coming soon!')}
+            secondaryButtonAction={() => handleReturn(tool)}
           />
         ))}
       </div>

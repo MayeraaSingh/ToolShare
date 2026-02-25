@@ -37,6 +37,9 @@ router.get('/gettools', async (req, res) => {
 // Route to rent a tool (protected)
 router.post('/rent/:toolId', verifyToken, ToolController.rentTool);
 
+// Route to return a borrowed tool (protected)
+router.post('/return/:toolId', verifyToken, ToolController.returnTool);
+
 // Route to save a tool for later (protected)
 router.post('/save/:toolId', verifyToken, ToolController.saveTool);
 

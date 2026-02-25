@@ -148,6 +148,31 @@ class ToolController {
         }
     }
 
+    // Return a borrowed tool
+    async returnTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const userId = req.userId;
+
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) return res.status(404).json({ message: 'Tool not found' });
+
+            const UserModel = (await import('../models/User.js')).default;
+
+            // Mark tool as available again
+            await ToolModel.updateTool(toolId, { availability: true });
+
+            // Remove from user's borrowed list
+            await UserModel.model.findByIdAndUpdate(userId, {
+                $pull: { toolsBorrowed: toolId }
+            });
+
+            res.status(200).json({ message: 'Tool returned successfully' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error returning tool', error: error.message });
+        }
+    }
+
     // Save a tool to user's reviewed list
     async saveTool(req, res) {
         try {
