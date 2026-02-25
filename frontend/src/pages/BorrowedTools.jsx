@@ -43,6 +43,11 @@ const BorrowedTools = () => {
       });
       const data = await res.json();
       if (res.ok) {
+        setTools((prev) =>
+          prev.map((t) =>
+            t._id === tool._id ? { ...t, dueDate: data.newDueDate } : t
+          )
+        );
         toast.success(`${tool.name} renewed successfully!`);
       } else {
         toast.error(data.message || 'Failed to renew tool');
@@ -50,6 +55,11 @@ const BorrowedTools = () => {
     } catch {
       toast.error('An error occurred. Please try again.');
     }
+  };
+
+  const getDaysLeft = (dueDate) => {
+    if (!dueDate) return null;
+    return Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24));
   };
 
   const handleReturn = async (tool) => {
@@ -101,6 +111,7 @@ const BorrowedTools = () => {
             image={tool.image}
             description={tool.description}
             flatNumber={tool.owner?.flatNumber}
+            daysLeft={getDaysLeft(tool.dueDate)}
             primaryButtonText="Renew"
             primaryButtonAction={() => handleRenew(tool)}
             secondaryButtonText="Return"
