@@ -35,6 +35,23 @@ const BorrowedTools = () => {
     fetchTools();
   }, [currentUser]);
 
+  const handleRenew = async (tool) => {
+    try {
+      const res = await fetch(`/api/tools/renew/${tool._id}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`${tool.name} renewed successfully!`);
+      } else {
+        toast.error(data.message || 'Failed to renew tool');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    }
+  };
+
   const handleReturn = async (tool) => {
     try {
       const res = await fetch(`/api/tools/return/${tool._id}`, {
@@ -85,7 +102,7 @@ const BorrowedTools = () => {
             description={tool.description}
             flatNumber={tool.owner?.flatNumber}
             primaryButtonText="Renew"
-            primaryButtonAction={() => toast.success('Renew functionality coming soon!')}
+            primaryButtonAction={() => handleRenew(tool)}
             secondaryButtonText="Return"
             secondaryButtonAction={() => handleReturn(tool)}
           />
