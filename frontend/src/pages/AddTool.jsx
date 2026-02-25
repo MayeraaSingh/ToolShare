@@ -33,18 +33,23 @@ export default function AddTool(){
             return;
         }
 
-        // Optional: Compress the image
         try {
             const compressedFile = await imageCompression(file, {
                 maxSizeMB: 1,
                 maxWidthOrHeight: 1024,
                 useWebWorker: true,
             });
-            setToolData((prevData) => ({ ...prevData, image: compressedFile }));
-            toast.success("Image compressed successfully!");
+
+            // Convert to base64 data URI so it can be stored directly in MongoDB
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setToolData((prevData) => ({ ...prevData, image: reader.result }));
+                toast.success("Image ready!");
+            };
+            reader.readAsDataURL(compressedFile);
         } catch (error) {
-            toast.error("Image compression failed. Please try another image.");
-            console.error("Image compression failed:", error);
+            toast.error("Image processing failed. Please try another image.");
+            console.error("Image processing failed:", error);
         }
     };
 
@@ -56,22 +61,22 @@ export default function AddTool(){
             return;
         }
 
-        const formData = new FormData();
-        formData.append('name', toolData.name);
-        formData.append('description', toolData.description);
-        formData.append('owner', currentUser._id);
-        formData.append('max', toolData.max);
-        formData.append('price', toolData.price);
-        if (toolData.image) {
-            formData.append('image', toolData.image);
-        }
+        const payload = {
+            name: toolData.name,
+            description: toolData.description,
+            owner: currentUser._id,
+            max: toolData.max,
+            price: toolData.price,
+            ...(toolData.image && { image: toolData.image }),
+        };
 
         try {
             dispatch(updateStart());
 
             const response = await fetch("/api/tools/add", {
                 method: "POST",
-                body: formData,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
                 credentials: 'include'
             });
 

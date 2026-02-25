@@ -4,14 +4,13 @@ class ToolController {
     // Add a new tool
     async addTool(req, res, next) {
         try {
-            const { name, description, owner, availability, max, price } = req.body;
+            const { name, description, owner, availability, max, price, image } = req.body;
     
             if (!name || !description || !owner) {
                 return res.status(400).json({ message: 'Name, description, and owner are required.' });
             }
 
-            // Handle image upload - use uploaded file path or default
-            const imagePath = req.file ? `/uploads/${req.file.filename}` : "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
+            const imagePath = image || "https://static.vecteezy.com/system/resources/previews/005/544/718/non_2x/profile-icon-design-free-vector.jpg";
     
             const tool = await ToolModel.createTool({
                 name,
