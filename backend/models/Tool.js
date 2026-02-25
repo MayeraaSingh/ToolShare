@@ -35,19 +35,22 @@ class ToolModel {
         return await this.model.findByIdAndUpdate(toolId, updatedData, { new: true });
     }
 
-    // Get all tools
-    async getAllTools() {
-        return await this.model.find().populate('owner');
+    // Get all tools, optionally excluding a specific owner
+    async getAllTools(excludeUserId) {
+        const filter = excludeUserId ? { owner: { $ne: excludeUserId } } : {};
+        return await this.model.find(filter).populate('owner');
     }
 
-    // Search tools by name or description
-    async searchTools(query) {
-        return await this.model.find({
+    // Search tools by name or description, optionally excluding a specific owner
+    async searchTools(query, excludeUserId) {
+        const filter = {
             $or: [
                 { name: { $regex: query, $options: 'i' } },
                 { description: { $regex: query, $options: 'i' } }
             ]
-        }).populate('owner');
+        };
+        if (excludeUserId) filter.owner = { $ne: excludeUserId };
+        return await this.model.find(filter).populate('owner');
     }
 
     // Get tools by owner (user ID)

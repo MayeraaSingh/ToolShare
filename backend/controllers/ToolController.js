@@ -69,7 +69,7 @@ class ToolController {
     // Get all tools
     async getAllTools(req, res) {
         try {
-            const tools = await ToolModel.getAllTools();
+            const tools = await ToolModel.getAllTools(req.userId);
             res.status(200).json(tools);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching tools', error: error.message });
@@ -83,7 +83,7 @@ class ToolController {
             if (!q) {
                 return res.status(400).json({ message: 'Search query is required' });
             }
-            const tools = await ToolModel.searchTools(q);
+            const tools = await ToolModel.searchTools(q, req.userId);
             res.status(200).json(tools);
         } catch (error) {
             res.status(500).json({ message: 'Error searching tools', error: error.message });

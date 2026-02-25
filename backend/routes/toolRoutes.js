@@ -11,11 +11,11 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 });
 
-// Route to get all tools (public)
-router.get('/', ToolController.getAllTools);
+// Route to get all tools (public, own tools excluded when logged in)
+router.get('/', optionalAuth, ToolController.getAllTools);
 
-// Route to search tools (public)
-router.get('/search', ToolController.searchTools);
+// Route to search tools (public, own tools excluded when logged in)
+router.get('/search', optionalAuth, ToolController.searchTools);
 
 // Route to get borrowed tools by user (protected)
 router.get('/borrowed/:userId', verifyToken, ToolController.getBorrowedToolsByUser);
