@@ -60,7 +60,7 @@ class ToolController {
                 return res.status(404).json({ message: 'Tool not found' });
             }
             
-            if (tool.owner.toString() !== req.userId) {
+            if (tool.owner._id.toString() !== req.userId) {
                 return res.status(403).json({ message: 'Not authorized to update this tool' });
             }
             
@@ -111,7 +111,10 @@ class ToolController {
         try {
             const { userId } = req.params;
             const UserModel = (await import('../models/User.js')).default;
-            const user = await UserModel.findById(userId);
+            const user = await UserModel.model.findById(userId).populate({
+                path: 'toolsBorrowed',
+                populate: { path: 'owner', select: 'name flatNumber phone' }
+            });
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -190,6 +193,31 @@ class ToolController {
         }
     }
 
+    // Renew a borrowed tool (extends the borrow period)
+    async renewTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const userId = req.userId;
+
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) return res.status(404).json({ message: 'Tool not found' });
+
+            const isRentedByUser = tool.rentedBy.some(
+                (u) => u._id ? u._id.toString() === userId : u.toString() === userId
+            );
+            if (!isRentedByUser) {
+                return res.status(400).json({ message: 'You have not borrowed this tool' });
+            }
+
+            // Update renewedAt timestamp on the tool document
+            await ToolModel.model.findByIdAndUpdate(toolId, { renewedAt: new Date() });
+
+            res.status(200).json({ message: 'Tool renewed successfully' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error renewing tool', error: error.message });
+        }
+    }
+
     // Save a tool to user's reviewed list
     async saveTool(req, res) {
         try {
@@ -238,7 +266,7 @@ class ToolController {
                 return res.status(404).json({ message: 'Tool not found' });
             }
             
-            if (tool.owner.toString() !== req.userId) {
+            if (tool.owner._id.toString() !== req.userId) {
                 return res.status(403).json({ message: 'Not authorized to delete this tool' });
             }
             
