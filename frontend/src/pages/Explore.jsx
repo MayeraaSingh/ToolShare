@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'flowbite-react';
 import toast from 'react-hot-toast';
 import ToolCard from '../components/ToolCard';
 
 const ExplorePage = () => {
-  // State to store tools data
+  const navigate = useNavigate();
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,8 +13,7 @@ const ExplorePage = () => {
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        // Fetch the tools from your backend using fetch
-        const response = await fetch('/api/tools/gettools', {
+        const response = await fetch('/api/tools/', {
           credentials: 'include'
         });
         if (!response.ok) {
@@ -65,7 +65,7 @@ const ExplorePage = () => {
             description={tool.description}
             flatNumber={tool.owner?.flatNumber}
             primaryButtonText="View"
-            primaryButtonAction={() => console.log('View tool', tool._id)}
+            primaryButtonAction={() => navigate(`/tool/${tool._id}`)}
           />
         ))}
       </div>
