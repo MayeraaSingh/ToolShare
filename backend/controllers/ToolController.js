@@ -21,6 +21,12 @@ class ToolController {
                 price: price || 0.00,
                 image: imagePath,
             });
+
+            // Keep user.toolsOwned in sync
+            const UserModel = (await import('../models/User.js')).default;
+            await UserModel.model.findByIdAndUpdate(owner, {
+                $addToSet: { toolsOwned: tool._id }
+            });
     
             res.status(201).json({ message: 'Tool added successfully', tool });
         } catch (error) {
