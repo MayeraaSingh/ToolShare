@@ -59,20 +59,22 @@ export default function DashProfile() {
         toast.error('Could not upload image');
         setImageFileUploadProgress(null);
         setImageFile(null);
-        setImageFileUrl(null);
+        setImageFileUrl(user?.profilePicture || '');
         setImageFileUploading(false);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref)
           .then((downloadURL) => {
             setImageFileUrl(downloadURL);
-            setFormData({ ...formData, profilePicture: downloadURL });
+            setFormData((prev) => ({ ...prev, profilePicture: downloadURL }));
+            setImageFileUploadProgress(null);
             setImageFileUploading(false);
             toast.success('Image uploaded successfully!');
           })
-          .catch((error) => {
+          .catch(() => {
             setImageFileError('Error getting download URL');
             toast.error('Error getting download URL');
+            setImageFileUploadProgress(null);
             setImageFileUploading(false);
           });
       }
