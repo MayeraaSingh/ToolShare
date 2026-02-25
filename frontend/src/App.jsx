@@ -17,6 +17,7 @@ import ReviewedTools from './pages/ReviewedTools';
 import Manageprofile from './pages/Manageprofile';
 import SearchResultsPage from './pages/SearchResults';
 import Tool from './pages/Tool';
+import PrivateRoute from './components/PrivateRoute';
 
 // Error Boundary to catch and display render errors instead of white screen
 class ErrorBoundary extends Component {
@@ -65,16 +66,19 @@ export default function App() {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/explore' element={<Explore />} />
-          <Route path='/addtool' element={<AddTool />} />
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/borrowed' element={<BorrowedTools />} />
-          <Route path='/reviewed' element={<ReviewedTools />} />
           <Route path='/about' element={<AboutUs />} />
-          <Route path='/registered' element={<RegisteredTools />} />
-          <Route path='/manage-profile' element={<Manageprofile />} />
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/tool/:toolId" element={<Tool />} />
+          {/* Protected routes */}
+          <Route element={<PrivateRoute />}>
+            <Route path='/addtool' element={<AddTool />} />
+            <Route path='/borrowed' element={<BorrowedTools />} />
+            <Route path='/reviewed' element={<ReviewedTools />} />
+            <Route path='/registered' element={<RegisteredTools />} />
+            <Route path='/manage-profile' element={<Manageprofile />} />
+          </Route>
         </Routes>
         <Footer />
       </BrowserRouter>
