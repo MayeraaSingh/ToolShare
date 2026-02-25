@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaUserCircle, FaMoon, FaHome } from 'react-icons/fa';
@@ -16,10 +16,18 @@ export default function Header() {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const closeMenuTimeoutRef = useRef(null);
 
     // Get current user from Redux
     const user = useSelector((state) => state.user.currentUser);
-    console.log('[Header] Rendering, currentUser:', user);
+
+    const scheduleMenuClose = () => {
+        closeMenuTimeoutRef.current = setTimeout(() => setIsUserMenuOpen(false), 5000);
+    };
+
+    const cancelMenuClose = () => {
+        if (closeMenuTimeoutRef.current) clearTimeout(closeMenuTimeoutRef.current);
+    };
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);
@@ -105,7 +113,7 @@ export default function Header() {
                     {/* User Icon */}
                     <div
                         className="relative flex items-center justify-center"
-                        onMouseLeave={() => setTimeout(() => setIsUserMenuOpen(false), 5000)}
+                        onMouseLeave={scheduleMenuClose}
                     >
                         <Button
                             className="w-12 h-10 flex items-center justify-center hover:shadow-md transition-shadow"
@@ -118,8 +126,8 @@ export default function Header() {
                         {isUserMenuOpen && (
                             <div
                                 className="absolute top-full right-0 mt-2 bg-white dark:bg-gray-700 shadow-lg rounded-lg p-4 w-80 z-50"
-                                onMouseEnter={() => clearTimeout()} // Cancel timeout on hover
-                                onMouseLeave={() => setTimeout(() => setIsUserMenuOpen(false), 5000)} // Close after 5 seconds
+                                onMouseEnter={cancelMenuClose}
+                                onMouseLeave={scheduleMenuClose}
                             >
                                 {user ? (
                                     <div className="flex flex-col items-start">

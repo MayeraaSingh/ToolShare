@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from 'flowbite-react';
 
 const ToolCard = ({ title, image, description, flatNumber, primaryButtonText, primaryButtonAction, secondaryButtonText, secondaryButtonAction }) => {
@@ -17,9 +16,11 @@ const ToolCard = ({ title, image, description, flatNumber, primaryButtonText, pr
           <Button onClick={primaryButtonAction}>
             {primaryButtonText}
           </Button>
-          <Button outline onClick={secondaryButtonAction}>
-            {secondaryButtonText}
-          </Button>
+          {secondaryButtonText && (
+            <Button outline onClick={secondaryButtonAction}>
+              {secondaryButtonText}
+            </Button>
+          )}
         </div>
       </div>
     </div>
