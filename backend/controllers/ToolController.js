@@ -148,6 +148,43 @@ class ToolController {
         }
     }
 
+    // Save a tool to user's reviewed list
+    async saveTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const userId = req.userId;
+
+            const tool = await ToolModel.findById(toolId);
+            if (!tool) return res.status(404).json({ message: 'Tool not found' });
+
+            const UserModel = (await import('../models/User.js')).default;
+            await UserModel.model.findByIdAndUpdate(userId, {
+                $addToSet: { toolsReviewed: toolId }
+            });
+
+            res.status(200).json({ message: 'Tool saved successfully' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error saving tool', error: error.message });
+        }
+    }
+
+    // Remove a tool from user's reviewed list
+    async unsaveTool(req, res) {
+        try {
+            const { toolId } = req.params;
+            const userId = req.userId;
+
+            const UserModel = (await import('../models/User.js')).default;
+            await UserModel.model.findByIdAndUpdate(userId, {
+                $pull: { toolsReviewed: toolId }
+            });
+
+            res.status(200).json({ message: 'Tool removed from saved' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error removing saved tool', error: error.message });
+        }
+    }
+
     // Delete tool
     async deleteTool(req, res) {
         try {

@@ -60,8 +60,25 @@ function ProductDetails() {
     }
   };
 
-  const handleReviewLater = () => {
-    toast.success('Saved for later! (feature coming soon)');
+  const handleReviewLater = async () => {
+    if (!currentUser) {
+      toast.error('Please log in to save a tool');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/tools/save/${toolId}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Tool saved for later!');
+      } else {
+        toast.error(data.message || 'Failed to save tool');
+      }
+    } catch {
+      toast.error('An error occurred. Please try again.');
+    }
   };
 
   if (loading) {

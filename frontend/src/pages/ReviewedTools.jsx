@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'flowbite-react';
 import toast from 'react-hot-toast';
 import ToolCard from '../components/ToolCard.jsx';
 
 export default function ReviewedTools() {
+    const navigate = useNavigate();
     const [tools, setTools] = useState([]);
     const [loading, setLoading] = useState(true);
     const { currentUser } = useSelector((state) => state.user);
@@ -37,11 +39,25 @@ export default function ReviewedTools() {
     }, [currentUser]);
     
     const handleRentClick = (tool) => {
-        toast.success(`Rent functionality for ${tool.name} coming soon!`);
+        navigate(`/tool/${tool._id}`);
     };
-    
-    const handleRemoveClick = (tool) => {
-        toast.success(`Remove functionality for ${tool.name} coming soon!`);
+
+    const handleRemoveClick = async (tool) => {
+        try {
+            const res = await fetch(`/api/tools/save/${tool._id}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setTools((prev) => prev.filter((t) => t._id !== tool._id));
+                toast.success('Removed from saved');
+            } else {
+                toast.error(data.message || 'Failed to remove tool');
+            }
+        } catch {
+            toast.error('An error occurred. Please try again.');
+        }
     };
 
     if (loading) {

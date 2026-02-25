@@ -37,6 +37,12 @@ router.get('/gettools', async (req, res) => {
 // Route to rent a tool (protected)
 router.post('/rent/:toolId', verifyToken, ToolController.rentTool);
 
+// Route to save a tool for later (protected)
+router.post('/save/:toolId', verifyToken, ToolController.saveTool);
+
+// Route to remove a tool from saved (protected)
+router.delete('/save/:toolId', verifyToken, ToolController.unsaveTool);
+
 // Route to add a new tool (protected)
 router.post('/add', verifyToken, ToolController.addTool);
 
