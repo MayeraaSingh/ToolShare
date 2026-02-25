@@ -8,6 +8,7 @@ class ToolModel {
             owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // User who owns the tool
             availability: { type: Boolean, default: true }, // True = Available, False = Borrowed
             max: { type: Number, default: 1 },
+            rentedCount: { type: Number, default: 0 }, // How many are currently rented out
             price: { type: Number, default: 0.00 },
             image: { 
                 type: String, 
