@@ -27,3 +27,5 @@ dist-ssr
 # Project documentation (sensitive analysis)
 PROJECT_ANALYSIS.md
 CODEBASE_ANALYSIS.md
+
+*.mp4
