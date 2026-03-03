@@ -1,4 +1,4 @@
-const members = ["Mishka", "Khushi", "Mayeraa"];
+const members = ["Mayeraa", "Khushi", "Mishka"];
 
 export default function AboutUs() {
   return (
