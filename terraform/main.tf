@@ -44,7 +44,7 @@ resource "aws_security_group" "devsec_sg" {
 
 resource "aws_instance" "devsec_server" {
   ami           = "ami-0f5ee92e2d63afc18"
-  instance_type = "t3.micro"
+  instance_type = "t3.small"
 
   key_name = "devsec-key"
 
