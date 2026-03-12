@@ -19,13 +19,19 @@ pipeline {
 
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $IMAGE_BACKEND ./backend'
+                sh '''
+                cd backend
+                docker build -t $IMAGE_BACKEND .
+                '''
             }
         }
 
         stage('Build Frontend Image') {
             steps {
-                sh 'docker build -t $IMAGE_FRONTEND ./frontend'
+                sh '''
+                cd frontend
+                docker build -t $IMAGE_FRONTEND .
+                '''
             }
         }
 
