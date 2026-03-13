@@ -30,6 +30,7 @@ mongoose
 
  
 const app = express();
+app.set('trust proxy', 1);
 const upload = multer({
     dest: "uploads/", // Directory for uploaded files
     limits: { fileSize: 5 * 1024 * 1024 }, // File size limit: 5 MB
@@ -53,7 +54,7 @@ app.use(cookieParser());
 
 // Enable CORS for all routes or specify allowed origins
 app.use(cors({
-    origin: 'http://localhost:5173',  // Allow requests only from this frontend address
+    origin: ['http://localhost:5173', 'http://13.234.32.100:3000'],  // Allow requests only from this frontend address
     methods: ['GET', 'POST', 'PUT', 'DELETE'],        // Allow specific methods
     credentials: true,                // If you need to handle cookies or other credentials
   }));
