@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
-        IMAGE_BACKEND = "mishkaaaa/backend:latest"
-        IMAGE_FRONTEND = "mishkaaaa/frontend:latest"
+        IMAGE_BACKEND = "mishhkaaa/toolshare-backend:latest"
+        IMAGE_FRONTEND = "mishhkaaa/toolshare-frontend:latest"
     }
 
     stages {
