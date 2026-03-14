@@ -19,7 +19,7 @@ pipeline {
 
         stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $IMAGE_BACKEND -f backend/Dockerfile .'
+                sh 'docker build --no-cache -t $IMAGE_BACKEND -f backend/Dockerfile .'
             }
         }
 
@@ -27,36 +27,43 @@ pipeline {
             steps {
                 sh '''
                 cd frontend
-                docker build -t $IMAGE_FRONTEND .
+                docker build --no-cache -t $IMAGE_FRONTEND .
                 '''
             }
         }
 
         stage('Trivy Scan Backend') {
             steps {
-                sh 'trivy image $IMAGE_BACKEND'
+                sh 'trivy image --severity HIGH,CRITICAL $IMAGE_BACKEND'
             }
         }
 
         stage('Trivy Scan Frontend') {
             steps {
-                sh 'trivy image $IMAGE_FRONTEND'
+                sh 'trivy image --severity HIGH,CRITICAL $IMAGE_FRONTEND'
             }
         }
 
         stage('Push Images') {
             steps {
-                sh 'echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin'
-                sh 'docker push $IMAGE_BACKEND'
-                sh 'docker push $IMAGE_FRONTEND'
+                sh '''
+                echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin
+                docker push $IMAGE_BACKEND
+                docker push $IMAGE_FRONTEND
+                '''
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f backend-deployment.yaml'
-                sh 'kubectl apply -f frontend-deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
+                sh '''
+                kubectl apply -f backend-deployment.yaml
+                kubectl apply -f frontend-deployment.yaml
+                kubectl apply -f service.yaml
+
+                kubectl rollout restart deployment backend-deployment
+                kubectl rollout restart deployment frontend-deployment
+                '''
             }
         }
     }
