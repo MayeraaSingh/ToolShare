@@ -6,15 +6,6 @@
   tasks:
 
     # -------------------------
-    # Remove leftover Jenkins repo (prevents apt errors)
-    # -------------------------
-
-    - name: Remove Jenkins repository if it exists
-      file:
-        path: /etc/apt/sources.list.d/jenkins.list
-        state: absent
-
-    # -------------------------
     # Update system
     # -------------------------
 
