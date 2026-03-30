@@ -3,6 +3,7 @@ const router = express.Router();
 import UserController from '../controllers/UserController.js';
 import { verifyToken } from '../middleware/auth.js';
 import admin from "firebase-admin";
+import UserModel from '../models/User.js';
 
 // Route to logout (clears cookies)
 router.post('/logout', UserController.logout);
@@ -32,10 +33,10 @@ router.post("/google", async (req, res) => {
     const email = decoded.email;
     const name = decoded.name;
 
-    let user = await User.findOne({ email });
+    let user = await UserModel.findByEmail(email);
 
     if (!user) {
-      user = await User.create({
+      user = await UserModel.createUser({
         email,
         name,
       });
