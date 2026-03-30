@@ -13,13 +13,14 @@ export default function OAuth() {
     const auth = getAuth(app)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    
+    console.log("NEW CODE LOADED - TOKEN VERSION");
     const handleGoogleClick = async () =>{
         const provider = new GoogleAuthProvider()
         provider.setCustomParameters({ prompt: 'select_account' })
         try {
             const resultsFromGoogle = await signInWithPopup(auth, provider)
             const idToken = await resultsFromGoogle.user.getIdToken();
+            console.log("TOKEN:", idToken);
             const res = await axios.post('/api/users/google', {
                     idToken: idToken,
                     name: resultsFromGoogle.user.displayName,
