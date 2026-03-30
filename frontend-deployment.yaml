@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: khushieee4/frontend-image
+        image: khushieee4/frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

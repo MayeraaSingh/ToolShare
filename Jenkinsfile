@@ -4,15 +4,15 @@ pipeline {
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
 
-        IMAGE_BACKEND = "mishhkaaa/toolshare-backend:latest"
-        IMAGE_FRONTEND = "mishhkaaa/toolshare-frontend:latest"
+        IMAGE_BACKEND = "khushieee4/backend:latest"
+        IMAGE_FRONTEND = "khushieee4/frontend:latest"
 
-        FB_API_KEY = credentials('fb_api_key')
-        FB_AUTH_DOMAIN = credentials('fb_auth_domain')
-        FB_PROJECT_ID = credentials('fb_project_id')
-        FB_STORAGE_BUCKET = credentials('fb_storage_bucket')
-        FB_MSG_ID = credentials('fb_msg_id')
-        FB_APP_ID = credentials('fb_app_id')
+        VITE_FIREBASE_API_KEY = credentials('VITE_FIREBASE_API_KEY')
+        VITE_FIREBASE_AUTH_DOMAIN = credentials('VITE_FIREBASE_AUTH_DOMAIN')
+        VITE_FIREBASE_PROJECT_ID = credentials('VITE_FIREBASE_PROJECT_ID')
+        VITE_FIREBASE_STORAGE_BUCKET = credentials('VITE_FIREBASE_STORAGE_BUCKET')
+        VITE_FIREBASE_MESSAGING_SENDER_ID = credentials('VITE_FIREBASE_MESSAGING_SENDER_ID')
+        VITE_FIREBASE_APP_ID = credentials('VITE_FIREBASE_APP_ID')
     }
 
     stages {
@@ -20,7 +20,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                credentialsId: 'github-creds',
                 url: 'https://github.com/MayeraaSingh/ToolShare.git'
             }
         }
@@ -36,12 +35,12 @@ pipeline {
                 sh '''
                 cd frontend
                 docker build --no-cache \
-                --build-arg VITE_FIREBASE_API_KEY=$FB_API_KEY \
-                --build-arg VITE_FIREBASE_AUTH_DOMAIN=$FB_AUTH_DOMAIN \
-                --build-arg VITE_FIREBASE_PROJECT_ID=$FB_PROJECT_ID \
-                --build-arg VITE_FIREBASE_STORAGE_BUCKET=$FB_STORAGE_BUCKET \
-                --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=$FB_MSG_ID \
-                --build-arg VITE_FIREBASE_APP_ID=$FB_APP_ID \
+                --build-arg VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY \
+                --build-arg VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN \
+                --build-arg VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID \
+                --build-arg VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET \
+                --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID \
+                --build-arg VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID \
                 -t $IMAGE_FRONTEND .
                 '''
             }

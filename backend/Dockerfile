@@ -2,14 +2,17 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy root package.json
 COPY package.json ./
 
-RUN npm install --production
+# Install dependencies
+RUN npm install
 
-COPY backend/ ./backend/
+# Copy backend code
+COPY backend/ .
 
-RUN mkdir -p uploads
-
+# Expose port
 EXPOSE 3000
 
-CMD ["node", "backend/index.js"]
+# Start app
+CMD ["node", "index.js"]
