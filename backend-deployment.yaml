@@ -18,3 +18,25 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: CORS_ORIGIN
+          value: "http://13.234.32.100:30007"
+        - name: MONGO
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: MONGO
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: JWT_SECRET
+        - name: FIREBASE_SERVICE_ACCOUNT_JSON
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: FIREBASE_SERVICE_ACCOUNT_JSON

@@ -33,3 +33,5 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform-provider-aws_v6.35.1_x5.exe
 .terraform/
+firebase-service-account.json
+/.claude

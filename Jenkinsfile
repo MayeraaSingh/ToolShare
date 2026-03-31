@@ -13,6 +13,10 @@ pipeline {
         VITE_FIREBASE_STORAGE_BUCKET = credentials('VITE_FIREBASE_STORAGE_BUCKET')
         VITE_FIREBASE_MESSAGING_SENDER_ID = credentials('VITE_FIREBASE_MESSAGING_SENDER_ID')
         VITE_FIREBASE_APP_ID = credentials('VITE_FIREBASE_APP_ID')
+
+        MONGO = credentials('MONGO')
+        JWT_SECRET = credentials('JWT_SECRET')
+        FIREBASE_SERVICE_ACCOUNT_JSON = credentials('FIREBASE_SERVICE_ACCOUNT_JSON')
     }
 
     stages {
@@ -71,6 +75,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                kubectl create secret generic backend-secrets \
+                  --from-literal=MONGO=$MONGO \
+                  --from-literal=JWT_SECRET=$JWT_SECRET \
+                  --from-literal=FIREBASE_SERVICE_ACCOUNT_JSON=$FIREBASE_SERVICE_ACCOUNT_JSON \
+                  --dry-run=client -o yaml | kubectl apply -f -
+
                 kubectl apply -f backend-deployment.yaml
                 kubectl apply -f frontend-deployment.yaml
                 kubectl apply -f service.yaml
