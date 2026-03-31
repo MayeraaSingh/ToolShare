@@ -24,7 +24,7 @@ spec:
         - name: PORT
           value: "3000"
         - name: CORS_ORIGIN
-          value: "http://13.234.32.100:30007"
+          value: "http://3.6.219.175:30007"
         - name: MONGO
           valueFrom:
             secretKeyRef:
