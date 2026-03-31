@@ -75,16 +75,22 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                # Write Firebase JSON safely to file
+                echo "$FIREBASE_SERVICE_ACCOUNT_JSON" > firebase.json
+
+                # Create/update Kubernetes secret safely
                 kubectl create secret generic backend-secrets \
                   --from-literal=MONGO=$MONGO \
                   --from-literal=JWT_SECRET=$JWT_SECRET \
-                  --from-literal=FIREBASE_SERVICE_ACCOUNT_JSON=$FIREBASE_SERVICE_ACCOUNT_JSON \
+                  --from-file=FIREBASE_SERVICE_ACCOUNT_JSON=firebase.json \
                   --dry-run=client -o yaml | kubectl apply -f -
 
+                # Apply deployments and services
                 kubectl apply -f backend-deployment.yaml
                 kubectl apply -f frontend-deployment.yaml
                 kubectl apply -f service.yaml
 
+                # Restart pods to pick new changes
                 kubectl rollout restart deployment backend-deployment
                 kubectl rollout restart deployment frontend-deployment
                 '''
