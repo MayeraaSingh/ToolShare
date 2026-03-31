@@ -16,7 +16,9 @@ pipeline {
 
         MONGO = credentials('MONGO')
         JWT_SECRET = credentials('JWT_SECRET')
-        FIREBASE_SERVICE_ACCOUNT_JSON = credentials('FIREBASE_SERVICE_ACCOUNT_JSON')
+
+        // USE BASE64 VERSION (IMPORTANT)
+        FIREBASE_SERVICE_ACCOUNT_JSON_BASE64 = credentials('FIREBASE_SERVICE_ACCOUNT_JSON_BASE64')
     }
 
     stages {
@@ -75,22 +77,22 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                # Write Firebase JSON safely to file
-                echo "$FIREBASE_SERVICE_ACCOUNT_JSON" > firebase.json
+                # Decode BASE64 → proper JSON file
+                echo "$FIREBASE_SERVICE_ACCOUNT_JSON_BASE64" | base64 -d > firebase.json
 
-                # Create/update Kubernetes secret safely
+                # Create/update Kubernetes secret
                 kubectl create secret generic backend-secrets \
                   --from-literal=MONGO=$MONGO \
                   --from-literal=JWT_SECRET=$JWT_SECRET \
                   --from-file=FIREBASE_SERVICE_ACCOUNT_JSON=firebase.json \
                   --dry-run=client -o yaml | kubectl apply -f -
 
-                # Apply deployments and services
+                # Deploy
                 kubectl apply -f backend-deployment.yaml
                 kubectl apply -f frontend-deployment.yaml
                 kubectl apply -f service.yaml
 
-                # Restart pods to pick new changes
+                # Restart pods
                 kubectl rollout restart deployment backend-deployment
                 kubectl rollout restart deployment frontend-deployment
                 '''
