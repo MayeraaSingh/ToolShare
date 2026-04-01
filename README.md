@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔧 ToolShare
+# 🔧 ToolShare- Tool Sharing Platform
 
 **A community-driven platform for sharing tools with your neighbours.**
 
