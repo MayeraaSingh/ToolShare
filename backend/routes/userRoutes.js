@@ -101,7 +101,7 @@ router.post("/google", async (req, res) => {
 			.status(200)
 			.cookie('access-token', token, {
 				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
+				secure: process.env.COOKIE_SECURE === 'true',
 				sameSite: 'lax',
 				maxAge: 7 * 24 * 60 * 60 * 1000,
 			})
@@ -114,7 +114,7 @@ router.post("/google", async (req, res) => {
 				phone: user.phone,
 			}), {
 				httpOnly: false,
-				secure: process.env.NODE_ENV === 'production',
+				secure: process.env.COOKIE_SECURE === 'true',
 				sameSite: 'lax',
 				maxAge: 7 * 24 * 60 * 60 * 1000,
 			})

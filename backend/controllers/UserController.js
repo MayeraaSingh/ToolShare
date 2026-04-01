@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 // HttpOnly for the auth token (not readable by JS - security)
 const authCookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.COOKIE_SECURE === 'true',
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
 };
@@ -13,7 +13,7 @@ const authCookieOptions = {
 // NOT httpOnly for user-data so JS can read it for state hydration on page refresh
 const dataCookieOptions = {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.COOKIE_SECURE === 'true',
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
 };
